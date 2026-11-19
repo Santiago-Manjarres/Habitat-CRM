@@ -1,0 +1,62 @@
+[
+  {
+    "id": "lead_001",
+    "clientId": "usr_client_01",
+    "agentId": "usr_admin_01",
+    "propertyId": "prop_001",
+    "stage": "contacted",
+    "notes": "Cliente interesado en financiar el 70% con crédito hipotecario.",
+    "createdAt": "2026-11-10T14:30:00.000Z",
+    "updatedAt": "2026-11-12T09:15:00.000Z"
+  },
+  {
+    "id": "lead_002",
+    "clientId": "usr_client_02",
+    "agentId": "usr_admin_01",
+    "propertyId": "prop_005",
+    "stage": "visit",
+    "notes": "Visita agendada para el sábado a las 10:00 a. m.",
+    "createdAt": "2026-11-11T10:00:00.000Z",
+    "updatedAt": "2026-11-14T17:40:00.000Z"
+  },
+  {
+    "id": "lead_003",
+    "clientId": "usr_client_01",
+    "agentId": "usr_admin_01",
+    "propertyId": "prop_004",
+    "stage": "new",
+    "notes": "",
+    "createdAt": "2026-11-17T08:05:00.000Z",
+    "updatedAt": "2026-11-17T08:05:00.000Z"
+  },
+  {
+    "id": "lead_004",
+    "clientId": "usr_client_02",
+    "agentId": "usr_admin_01",
+    "propertyId": "prop_002",
+    "stage": "negotiation",
+    "notes": "Ofertó $850 millones; pendiente respuesta del propietario.",
+    "createdAt": "2026-11-06T09:30:00.000Z",
+    "updatedAt": "2026-11-16T12:00:00.000Z"
+  },
+  {
+    "id": "lead_005",
+    "clientId": "usr_client_02",
+    "agentId": "usr_admin_01",
+    "propertyId": "prop_007",
+    "stage": "closed_won",
+    "notes": "Escrituración firmada en notaría.",
+    "createdAt": "2026-10-20T15:00:00.000Z",
+    "updatedAt": "2026-11-13T11:30:00.000Z"
+  },
+  {
+    "id": "lead_006",
+    "clientId": "usr_client_01",
+    "agentId": "usr_admin_01",
+    "propertyId": "prop_003",
+    "stage": "closed_lost",
+    "notes": "Prefirió una opción más cerca de su trabajo.",
+    "createdAt": "2026-11-01T16:20:00.000Z",
+    "updatedAt": "2026-11-09T10:10:00.000Z"
+  }
+]

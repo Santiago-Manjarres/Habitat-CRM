@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Imagen no disponible">
+  <rect width="800" height="600" fill="#f1f3f6"/>
+  <g fill="none" stroke="#8a93a3" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M300 300 L400 220 L500 300"/>
+    <path d="M325 285 V380 H475 V285"/>
+    <path d="M380 380 V330 H420 V380"/>
+  </g>
+  <text x="400" y="450" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="36" fill="#5b6475">Imagen no disponible</text>
+</svg>

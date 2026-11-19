@@ -1,0 +1,32 @@
+[
+  {
+    "id": "usr_admin_01",
+    "username": "admin",
+    "password": "admin",
+    "name": "Laura Mendoza (Asesora)",
+    "email": "admin@inmocrm.com",
+    "phone": "+57 300 111 2233",
+    "role": "admin",
+    "avatar": "LM"
+  },
+  {
+    "id": "usr_client_01",
+    "username": "client",
+    "password": "client",
+    "name": "Carlos Pérez",
+    "email": "carlos.perez@correo.com",
+    "phone": "+57 310 444 5566",
+    "role": "client",
+    "avatar": "CP"
+  },
+  {
+    "id": "usr_client_02",
+    "username": "ana.gomez",
+    "password": "1234",
+    "name": "Ana Gómez",
+    "email": "ana.gomez@correo.com",
+    "phone": "+57 320 777 8899",
+    "role": "client",
+    "avatar": "AG"
+  }
+]

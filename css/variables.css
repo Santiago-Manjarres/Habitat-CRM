@@ -1,0 +1,103 @@
+/* ==========================================================================
+   Habitat CRM — Design tokens (Spec §9.3)
+   The ONLY file allowed to declare literal colors, radii, shadows, durations.
+   Adjustments agreed with the product owner:
+   - Accent taken from the Habitat logo blue (#2667CC) instead of indigo.
+   - Base text size is 14px across all views (form fields 16px on mobile only).
+   - Font family: SF Pro Display (self-hosted) with system-ui fallback.
+   - Light theme only (no dark mode).
+   ========================================================================== */
+
+:root {
+  /* Brand: a single accent (Habitat logo blue) */
+  --color-accent: #2667cc;
+  --color-accent-hover: #1f56ad;
+  --color-accent-soft: #eaf1fc;      /* soft backgrounds, selection, focus */
+  --color-on-accent: #ffffff;        /* text/icons on accent or danger fills */
+
+  /* Neutrals */
+  --color-bg: #f7f8fa;               /* app background */
+  --color-surface: #ffffff;          /* cards, modals */
+  --color-surface-muted: #f1f3f6;    /* table headers, row hover */
+  --color-border: #e3e6eb;
+  --color-border-strong: #c9ced6;    /* form control borders (>= 3:1 not required for borders, aids clarity) */
+  --color-text: #1a1f2b;
+  --color-text-muted: #5b6475;       /* >= 4.5:1 on --color-surface (5.96:1) */
+  --color-text-faint: #8a93a3;       /* 3.1:1 — decorative icons only, never body text */
+  --color-neutral: #4a5263;          /* neutral badge text (closed_lost) */
+  --color-neutral-bg: #eef0f3;
+  --color-skeleton: #e9ecf0;
+  --color-backdrop: rgba(16, 24, 40, 0.32);
+
+  /* Semantic (property and lead states) */
+  --color-success: #0e7a4b;  --color-success-bg: #e6f6ee;   /* Available, Closed won */
+  --color-warning: #9a5b00;  --color-warning-bg: #fff4dc;   /* Negotiation */
+  --color-danger:  #b42318;  --color-danger-bg:  #fdeceb;   /* Sold / errors */
+  --color-danger-hover: #912018;
+  --color-info:    #1d5fd0;  --color-info-bg:    #e8f0fe;   /* New, Contacted */
+
+  /* Typography */
+  --font-sans: "SF Pro Display", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --text-xs: 12px;  --text-sm: 13px;  --text-base: 14px;
+  --text-md: 16px;  --text-lg: 20px;  --text-xl: 28px;
+  --text-field-mobile: 16px;         /* form fields on mobile: prevents iOS zoom on focus (Spec §9.5) */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-strong: 700;              /* SF Pro Display ships no upright Semibold */
+  --leading-body: 1.5;
+  --leading-tight: 1.2;
+  --tracking-tight: -0.01em;
+
+  /* Spacing (multiples of 4px) */
+  --space-1: 4px;  --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px; --space-6: 32px;  --space-7: 48px;
+
+  /* Control sizes */
+  --control-h: 44px;                 /* mobile-first: 44px touch target */
+  --control-h-desktop: 36px;
+  --control-h-sm: 32px;              /* buttons inside tables */
+  --field-h: 44px;
+  --field-h-desktop: 40px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --dot-size: 6px;
+  --bottom-nav-h: 56px;
+
+  /* Radii */
+  --radius-none: 0;
+  --radius-sm: 6px;   /* buttons, inputs, badges */
+  --radius-md: 10px;  /* cards */
+  --radius-lg: 14px;  /* modals */
+  --radius-full: 999px;
+
+  /* Shadows (the "border" is a 1px shadow) */
+  --shadow-border: 0 0 0 1px var(--color-border);
+  --shadow-field: 0 0 0 1px var(--color-border-strong);
+  --shadow-field-error: 0 0 0 1px var(--color-danger);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, .06), 0 0 0 1px var(--color-border);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, .08), 0 0 0 1px var(--color-border);
+  --shadow-lg: 0 16px 40px rgba(16, 24, 40, .16);
+  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-accent);
+  --focus-ring-error: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-danger);
+  --focus-ring-inset: inset 0 0 0 2px var(--color-accent);
+  --shadow-divider-bottom: 0 1px 0 var(--color-border);
+  --shadow-divider-top: 0 -1px 0 var(--color-border);
+  --shadow-divider-right: 1px 0 0 var(--color-border);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --duration-press: 120ms;   /* press feedback */
+  --duration-fast: 160ms;    /* hover, tooltips, chat-like inserts */
+  --duration-base: 220ms;    /* menus, dropdowns */
+  --duration-modal: 280ms;   /* modals and panels */
+  --duration-exit: 180ms;    /* exits are faster than entries */
+  --duration-spin: 700ms;    /* continuous spinner rotation (linear) */
+  --duration-pulse: 1400ms;  /* continuous skeleton pulse */
+  --stagger-step: 40ms;      /* first catalog load: delay between cards (max 8) */
+  --delay-boot-notice: 1200ms; /* boot notice only appears if the app failed to start */
+
+  /* Layers */
+  --z-nav: 100;  --z-modal: 1000;  --z-toast: 1100;
+}

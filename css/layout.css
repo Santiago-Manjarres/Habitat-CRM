@@ -1,0 +1,418 @@
+/* ==========================================================================
+   Habitat CRM — Layout: boot notice, login, client navbar, advisor sidebar, grids
+   Mobile-first. Breakpoints: 640px, 1024px, 1280px.
+   ========================================================================== */
+
+.icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Views are toggled with [hidden] by app.js */
+.view { min-height: 100dvh; }
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: max(var(--space-4), env(safe-area-inset-left)) max(var(--space-4), env(safe-area-inset-right));
+}
+
+@media (min-width: 640px) {
+  .container { padding-inline: var(--space-5); }
+}
+
+@media (min-width: 1024px) {
+  .container { padding-inline: var(--space-6); }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-h); /* 44px touch target */
+  border-radius: var(--radius-sm);
+  font-weight: var(--weight-strong);
+  font-size: var(--text-md);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.brand__logo {
+  width: 28px;
+  height: 26px;
+  object-fit: contain;
+}
+
+/* --------------------------------------------------------------------------
+   Boot notice: visible by default in static HTML. app.js hides it on start.
+   Only fades in after a delay, so it never flashes during a normal boot.
+   -------------------------------------------------------------------------- */
+.boot-notice {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--space-4);
+  opacity: 0;
+  animation: boot-notice-in var(--duration-fast) var(--ease-out) var(--delay-boot-notice) forwards;
+}
+
+.boot-notice__card {
+  display: grid;
+  gap: var(--space-3);
+  width: min(100%, 560px);
+  padding: var(--space-6);
+}
+
+.boot-notice code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  padding: 2px var(--space-1);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-muted);
+}
+
+.boot-notice ol {
+  display: grid;
+  gap: var(--space-2);
+  padding-left: var(--space-5);
+}
+
+@keyframes boot-notice-in {
+  to { opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   Login
+   -------------------------------------------------------------------------- */
+.view-login {
+  display: grid;
+  place-items: center;
+  padding: var(--space-5) var(--space-4) calc(var(--space-5) + env(safe-area-inset-bottom));
+}
+
+.auth-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  width: min(100%, 420px);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 640px) {
+  .auth-card { padding: var(--space-6); }
+}
+
+.auth-card__header {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.auth-card__logo {
+  width: var(--space-7);
+  height: 44px;
+  object-fit: contain;
+}
+
+.auth-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.auth-demo {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  box-shadow: var(--shadow-divider-top);
+}
+
+.auth-demo__label {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.auth-demo__buttons {
+  display: grid;
+  gap: var(--space-1);
+}
+
+@media (min-width: 640px) {
+  .auth-demo__buttons .btn { font-size: var(--text-sm); }
+}
+
+.form-grid {
+  display: grid;
+  align-items: start;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .form-grid--2 { grid-template-columns: 1fr 1fr; }
+}
+
+/* --------------------------------------------------------------------------
+   App header (client navbar + advisor topbar on mobile)
+   -------------------------------------------------------------------------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-divider-bottom);
+  padding-top: env(safe-area-inset-top);
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 64px;
+}
+
+.app-header__spacer { flex: 1; }
+
+.nav-links {
+  display: none;
+  gap: var(--space-1);
+}
+
+@media (min-width: 640px) {
+  .nav-links { display: flex; }
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-h-desktop);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+.nav-link:active { transform: scale(0.97); }
+
+.nav-link[aria-current="page"] {
+  color: var(--color-accent-hover);
+  background-color: var(--color-accent-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:not([aria-current="page"]):hover {
+    color: var(--color-text);
+    background-color: var(--color-surface-muted);
+  }
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.user-chip__text {
+  display: none;
+  min-width: 0;
+  line-height: var(--leading-tight);
+}
+
+.user-chip__name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-chip__role {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 1024px) {
+  .user-chip__text { display: grid; }
+}
+
+/* Logout: icon-only on mobile, labelled from 640px */
+.logout-btn__label { display: none; }
+
+@media (min-width: 640px) {
+  .logout-btn { width: auto; padding: 0 var(--space-3); }
+  .logout-btn__label { display: inline; }
+}
+
+/* --------------------------------------------------------------------------
+   Bottom navigation (mobile, both roles)
+   -------------------------------------------------------------------------- */
+.bottom-nav {
+  position: fixed;
+  z-index: var(--z-nav);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-divider-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav__link {
+  flex: 1;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  min-height: var(--bottom-nav-h);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+.bottom-nav__link:active { transform: scale(0.97); }
+
+.bottom-nav__link { position: relative; }
+
+.bottom-nav__link .nav-count-wrap {
+  position: absolute;
+  top: var(--space-1);
+  left: calc(50% + var(--space-2));
+}
+.bottom-nav__link[aria-current="page"] { color: var(--color-accent); }
+.bottom-nav__link:focus-visible { box-shadow: var(--focus-ring-inset); }
+
+.has-bottom-nav { padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom)); }
+
+@media (min-width: 640px) {
+  .bottom-nav--client { display: none; }
+  .has-bottom-nav--client { padding-bottom: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Advisor layout: fixed 240px sidebar on desktop (>= 1024px)
+   -------------------------------------------------------------------------- */
+.admin-layout {
+  min-height: 100dvh;
+}
+
+.sidebar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .admin-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-3);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-divider-right);
+  }
+
+  .admin-layout .app-header--mobile,
+  .admin-layout .bottom-nav { display: none; }
+  .admin-layout .has-bottom-nav { padding-bottom: 0; }
+}
+
+.sidebar .brand { padding-inline: var(--space-3); }
+
+.sidebar__nav {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.sidebar__nav .nav-link { min-height: var(--control-h-desktop); }
+
+.sidebar__footer {
+  margin-top: auto;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-muted);
+}
+
+.sidebar__footer .logout-btn { width: 100%; justify-content: flex-start; }
+.sidebar__footer .logout-btn__label { display: inline; }
+.sidebar__footer .user-chip__text { display: grid; }
+
+/* --------------------------------------------------------------------------
+   Page sections
+   -------------------------------------------------------------------------- */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* children never grow past the viewport */
+  gap: var(--space-5);
+  padding-block: var(--space-5) var(--space-7);
+}
+
+@media (min-width: 1024px) {
+  .page { padding-block: var(--space-6) var(--space-7); }
+}
+
+.page__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.page__title:focus,
+.page__title:focus-visible {
+  outline: none;
+  box-shadow: none; /* programmatic focus for screen readers only; headings are not interactive */
+}
+
+.page__subtitle {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Toasts sit above the mobile bottom navigation while it is visible
+   -------------------------------------------------------------------------- */
+body[data-view="client"] .toast-region,
+body[data-view="admin"] .toast-region {
+  bottom: calc(var(--bottom-nav-h) + var(--space-3) + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 640px) {
+  body[data-view="client"] .toast-region {
+    bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 1024px) {
+  body[data-view="admin"] .toast-region {
+    bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+  }
+}
+
+.form-grid--2 > .is-full { grid-column: 1 / -1; }
+
+.section-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+}
