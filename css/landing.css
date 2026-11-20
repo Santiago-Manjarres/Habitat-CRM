@@ -18,7 +18,10 @@
 /* at 320 the bar holds the logo, the main button and the menu: the name steps aside, the logo keeps its label */
 @media (max-width: 359px) { .nav .brand-name { display: none; } }
 /* Geist's ascenders are taller than the kit's .86 line: give the closing word room at its top */
-.close__word { line-height: 1.02; }
+.close__word { line-height: 1.02; flex-shrink: 0; }
+/* on a short window the closing keeps its full height instead of squeezing the name over the links */
+footer.closing { height: auto; min-height: 100vh; min-height: 100svh; }
+footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; }
 
 /* Status chips shared by every visual (the CRM's own states) */
 .st {
