@@ -8,6 +8,7 @@ import {
   OPERATION_LABELS,
   PROPERTY_STATUS_LABELS,
   LEAD_STAGE_LABELS,
+  LEAD_SOURCE_LABELS,
   ROLES,
   ENTITIES,
 } from '../config.js';
@@ -18,9 +19,6 @@ export const LIMITS = Object.freeze({
   descriptionMax: 2000,
   notesMax: 1000,
   nameMax: 80,
-  usernameMin: 3,
-  usernameMax: 30,
-  passwordMin: 4,
   priceMax: 1e13,
   areaMax: 1e6,
   roomsMax: 99,
@@ -67,24 +65,6 @@ export function validateLoginForm({ username, password }) {
   return buildResult(errors);
 }
 
-export function validateRegistrationForm(data) {
-  const errors = {};
-  const username = String(data.username ?? '').trim();
-  if (!isRequired(data.name)) errors.name = 'Escribe tu nombre completo';
-  else if (data.name.trim().length > LIMITS.nameMax) errors.name = `Usa máximo ${LIMITS.nameMax} caracteres`;
-  if (!/^[a-zA-Z0-9._-]+$/.test(username)) errors.username = 'Usa solo letras, números, punto, guion o guion bajo';
-  else if (username.length < LIMITS.usernameMin || username.length > LIMITS.usernameMax) {
-    errors.username = `El usuario debe tener entre ${LIMITS.usernameMin} y ${LIMITS.usernameMax} caracteres`;
-  }
-  if (!isValidEmail(data.email)) errors.email = 'Escribe un correo válido, por ejemplo nombre@correo.com';
-  if (isRequired(data.phone) && !isValidPhone(data.phone)) errors.phone = 'Escribe un teléfono válido, por ejemplo +57 300 123 4567';
-  if (String(data.password ?? '').length < LIMITS.passwordMin) {
-    errors.password = `La contraseña debe tener al menos ${LIMITS.passwordMin} caracteres`;
-  }
-  if (data.confirmPassword !== data.password) errors.confirmPassword = 'Las contraseñas no coinciden';
-  return buildResult(errors);
-}
-
 function validatePropertyText(data, errors) {
   if (!isRequired(data.title)) errors.title = 'El título es obligatorio';
   else if (data.title.trim().length > LIMITS.titleMax) errors.title = `Usa máximo ${LIMITS.titleMax} caracteres`;
@@ -97,7 +77,7 @@ function validatePropertyText(data, errors) {
   if (!(data.operation in OPERATION_LABELS)) errors.operation = 'Elige si es venta o arriendo';
   if (!(data.status in PROPERTY_STATUS_LABELS)) errors.status = 'Elige un estado válido';
   if (isRequired(data.imageUrl) && !isValidUrl(data.imageUrl)) {
-    errors.imageUrl = 'La URL de la imagen no es válida. Debe empezar por http:// o https://';
+    errors.imageUrl = 'El enlace de la foto no es válido. Cópialo completo, debe empezar por https://';
   }
 }
 
@@ -121,6 +101,24 @@ export function validatePropertyData(data) {
   return buildResult(errors);
 }
 
+/** Lead (contact) form: a name, at least one way to reach them, a property and an advisor. */
+export function validateLeadData(data) {
+  const errors = {};
+  const phone = String(data.contactPhone ?? '').trim();
+  const email = String(data.contactEmail ?? '').trim();
+  if (!isRequired(data.contactName)) errors.contactName = 'Escribe el nombre del cliente';
+  else if (data.contactName.trim().length > LIMITS.nameMax) errors.contactName = `Usa máximo ${LIMITS.nameMax} caracteres`;
+  if (phone && !isValidPhone(phone)) errors.contactPhone = 'Escribe un teléfono válido, por ejemplo +57 300 123 4567';
+  if (email && !isValidEmail(email)) errors.contactEmail = 'Escribe un correo válido, por ejemplo nombre@correo.com';
+  if (!phone && !email) errors.contactPhone = 'Escribe un teléfono o un correo para poder contactarlo';
+  if (!(data.source in LEAD_SOURCE_LABELS)) errors.source = 'Elige cómo llegó el cliente';
+  if (!isRequired(data.propertyId)) errors.propertyId = 'Elige la propiedad que le interesa';
+  if (!isRequired(data.agentId)) errors.agentId = 'Elige el asesor responsable';
+  if (!isValidLeadStage(data.stage)) errors.stage = 'Elige una etapa válida';
+  if (String(data.notes ?? '').length > LIMITS.notesMax) errors.notes = `Usa máximo ${LIMITS.notesMax} caracteres`;
+  return buildResult(errors);
+}
+
 export function validateLeadNotes(notes) {
   const errors = {};
   if (String(notes ?? '').length > LIMITS.notesMax) errors.notes = `Usa máximo ${LIMITS.notesMax} caracteres`;
@@ -140,7 +138,7 @@ const REQUIRED_FIELDS = {
     location: 'string', areaM2: 'number', bedrooms: 'number', bathrooms: 'number',
     status: 'string', agentId: 'string',
   },
-  leads: { id: 'string', clientId: 'string', propertyId: 'string', stage: 'string' },
+  leads: { id: 'string', contactName: 'string', propertyId: 'string', agentId: 'string', stage: 'string' },
 };
 
 function hasRequiredFields(item, schema) {
@@ -155,10 +153,11 @@ function findInvalidItem(entity, items) {
 
 function validateEnums(data) {
   if (data.users.some((u) => !Object.values(ROLES).includes(u.role))) return 'Hay usuarios con un rol desconocido';
-  if (!data.users.some((u) => u.role !== ROLES.client)) return 'El respaldo no contiene ningún asesor';
+  if (data.users.length === 0) return 'El respaldo no contiene ningún asesor';
   if (data.properties.some((p) => !(p.status in PROPERTY_STATUS_LABELS))) return 'Hay propiedades con un estado desconocido';
   if (data.properties.some((p) => !(p.operation in OPERATION_LABELS))) return 'Hay propiedades con una operación desconocida';
   if (data.leads.some((l) => !isValidLeadStage(l.stage))) return 'Hay leads con una etapa desconocida';
+  if (data.leads.some((l) => l.source !== undefined && !(l.source in LEAD_SOURCE_LABELS))) return 'Hay leads con un origen desconocido';
   return null;
 }
 

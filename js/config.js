@@ -6,6 +6,7 @@
  */
 
 export const APP_NAME = 'Habitat CRM';
+export const LANDING_URL = './index.html';
 export const LOCALE = 'es-CO';
 export const DEFAULT_CURRENCY = 'COP';
 
@@ -35,13 +36,9 @@ export const TOAST_DURATION_MS = 4000;
 export const TOAST_ERROR_DURATION_MS = 6000;
 export const TOAST_MAX_VISIBLE = 3;
 
-export const ROLES = Object.freeze({ admin: 'admin', agent: 'agent', client: 'client' });
+export const ROLES = Object.freeze({ admin: 'admin' });
 
-export const ROLE_LABELS = Object.freeze({
-  admin: 'Asesor',
-  agent: 'Asesor',
-  client: 'Cliente',
-});
+export const ROLE_LABELS = Object.freeze({ admin: 'Asesor' });
 
 export const PROPERTY_TYPES = Object.freeze(['Apartamento', 'Casa', 'Local', 'Oficina', 'Lote']);
 
@@ -61,8 +58,16 @@ export const LEAD_STAGE_LABELS = Object.freeze({
   contacted: 'Contactado',
   visit: 'Visita',
   negotiation: 'Negociación',
-  closed_won: 'Cerrado ganado',
+  closed_won: 'Negocio cerrado',
   closed_lost: 'Descartado',
+});
+
+export const LEAD_SOURCE_LABELS = Object.freeze({
+  web: 'Portal web',
+  phone: 'Llamada',
+  whatsapp: 'WhatsApp',
+  walk_in: 'Visita a la oficina',
+  referral: 'Referido',
 });
 
 export const CLOSED_LEAD_STAGES = Object.freeze(['closed_won', 'closed_lost']);
@@ -86,36 +91,9 @@ const IMG_PARAMS = '?auto=format&fit=crop&w=800&q=80';
 /** Embedded seed data — fallback for file:// (fetch blocked by CORS). */
 export const SEED_DATA = Object.freeze({
   users: [
-    {
-      id: 'usr_admin_01',
-      username: 'admin',
-      password: 'admin',
-      name: 'Laura Mendoza (Asesora)',
-      email: 'admin@inmocrm.com',
-      phone: '+57 300 111 2233',
-      role: 'admin',
-      avatar: 'LM',
-    },
-    {
-      id: 'usr_client_01',
-      username: 'client',
-      password: 'client',
-      name: 'Carlos Pérez',
-      email: 'carlos.perez@correo.com',
-      phone: '+57 310 444 5566',
-      role: 'client',
-      avatar: 'CP',
-    },
-    {
-      id: 'usr_client_02',
-      username: 'ana.gomez',
-      password: '1234',
-      name: 'Ana Gómez',
-      email: 'ana.gomez@correo.com',
-      phone: '+57 320 777 8899',
-      role: 'client',
-      avatar: 'AG',
-    },
+    { id: 'usr_admin_01', username: 'admin', password: 'admin', name: 'Laura Mendoza', email: 'laura.mendoza@habitat.example', phone: '+57 300 111 2233', role: 'admin', avatar: 'LM' },
+    { id: 'usr_agent_02', username: 'andres', password: '1234', name: 'Andrés Rojas', email: 'andres.rojas@habitat.example', phone: '+57 301 222 3344', role: 'admin', avatar: 'AR' },
+    { id: 'usr_agent_03', username: 'valentina', password: '1234', name: 'Valentina Ríos', email: 'valentina.rios@habitat.example', phone: '+57 302 333 4455', role: 'admin', avatar: 'VR' },
   ],
   properties: [
     {
@@ -149,7 +127,7 @@ export const SEED_DATA = Object.freeze({
       bathrooms: 4,
       parking: 2,
       status: 'available',
-      agentId: 'usr_admin_01',
+      agentId: 'usr_agent_02',
       description: 'Casa de dos niveles rodeada de zonas verdes, con chimenea, estudio, cuarto de servicio y amplio jardín privado.',
       imageUrl: `${UNSPLASH}photo-1568605114967-8130f3a36994${IMG_PARAMS}`,
       createdAt: '2026-10-18T15:30:00.000Z',
@@ -185,7 +163,7 @@ export const SEED_DATA = Object.freeze({
       bathrooms: 1,
       parking: 0,
       status: 'negotiation',
-      agentId: 'usr_admin_01',
+      agentId: 'usr_agent_02',
       description: 'Local esquinero con vitrina doble, alto flujo peatonal y vehicular. Ideal para restaurante o tienda.',
       imageUrl: `${UNSPLASH}photo-1441986300917-64674bd600d8${IMG_PARAMS}`,
       createdAt: '2026-10-25T11:45:00.000Z',
@@ -203,7 +181,7 @@ export const SEED_DATA = Object.freeze({
       bathrooms: 3,
       parking: 2,
       status: 'negotiation',
-      agentId: 'usr_admin_01',
+      agentId: 'usr_agent_03',
       description: 'Casa en conjunto con piscina, parque infantil y vigilancia 24 horas. Patio interior y terraza cubierta.',
       imageUrl: `${UNSPLASH}photo-1570129477492-45c003edd2be${IMG_PARAMS}`,
       createdAt: '2026-10-28T14:00:00.000Z',
@@ -221,7 +199,7 @@ export const SEED_DATA = Object.freeze({
       bathrooms: 2,
       parking: 2,
       status: 'available',
-      agentId: 'usr_admin_01',
+      agentId: 'usr_agent_02',
       description: 'Oficina con divisiones en vidrio, sala de juntas, recepción y acceso a auditorio compartido del edificio.',
       imageUrl: `${UNSPLASH}photo-1497366216548-37526070297c${IMG_PARAMS}`,
       createdAt: '2026-11-02T08:30:00.000Z',
@@ -239,7 +217,7 @@ export const SEED_DATA = Object.freeze({
       bathrooms: 4,
       parking: 3,
       status: 'sold',
-      agentId: 'usr_admin_01',
+      agentId: 'usr_agent_03',
       description: 'Penthouse de dos niveles con terraza de 60 m², jacuzzi, vista a los cerros orientales y acabados de lujo.',
       imageUrl: `${UNSPLASH}photo-1600596542815-ffad4c1539a9${IMG_PARAMS}`,
       createdAt: '2026-11-05T16:10:00.000Z',
@@ -275,7 +253,7 @@ export const SEED_DATA = Object.freeze({
       bathrooms: 1,
       parking: 0,
       status: 'available',
-      agentId: 'usr_admin_01',
+      agentId: 'usr_agent_03',
       description: 'Local en casona colonial restaurada, techos altos y fachada protegida. Excelente para café o galería.',
       imageUrl: `${UNSPLASH}photo-1555396273-367ea4eb4db5${IMG_PARAMS}`,
       createdAt: '2026-11-12T13:00:00.000Z',
@@ -284,19 +262,25 @@ export const SEED_DATA = Object.freeze({
   leads: [
     {
       id: 'lead_001',
-      clientId: 'usr_client_01',
-      agentId: 'usr_admin_01',
+      contactName: 'Carlos Pérez',
+      contactPhone: '+57 310 444 5566',
+      contactEmail: 'carlos.perez@correo.com',
+      source: 'web',
       propertyId: 'prop_001',
+      agentId: 'usr_admin_01',
       stage: 'contacted',
-      notes: 'Cliente interesado en financiar el 70% con crédito hipotecario.',
+      notes: 'Quiere financiar el 70% con crédito hipotecario.',
       createdAt: '2026-11-10T14:30:00.000Z',
       updatedAt: '2026-11-12T09:15:00.000Z',
     },
     {
       id: 'lead_002',
-      clientId: 'usr_client_02',
-      agentId: 'usr_admin_01',
+      contactName: 'Ana Gómez',
+      contactPhone: '+57 320 777 8899',
+      contactEmail: 'ana.gomez@correo.com',
+      source: 'whatsapp',
       propertyId: 'prop_005',
+      agentId: 'usr_agent_03',
       stage: 'visit',
       notes: 'Visita agendada para el sábado a las 10:00 a. m.',
       createdAt: '2026-11-11T10:00:00.000Z',
@@ -304,19 +288,25 @@ export const SEED_DATA = Object.freeze({
     },
     {
       id: 'lead_003',
-      clientId: 'usr_client_01',
-      agentId: 'usr_admin_01',
+      contactName: 'Jorge Castaño',
+      contactPhone: '+57 315 210 9087',
+      contactEmail: '',
+      source: 'phone',
       propertyId: 'prop_004',
+      agentId: 'usr_agent_02',
       stage: 'new',
       notes: '',
-      createdAt: '2026-11-17T08:05:00.000Z',
-      updatedAt: '2026-11-17T08:05:00.000Z',
+      createdAt: '2026-11-19T08:05:00.000Z',
+      updatedAt: '2026-11-19T08:05:00.000Z',
     },
     {
       id: 'lead_004',
-      clientId: 'usr_client_02',
-      agentId: 'usr_admin_01',
+      contactName: 'Felipe Arango',
+      contactPhone: '+57 318 640 1122',
+      contactEmail: 'felipe.arango@correo.com',
+      source: 'referral',
       propertyId: 'prop_002',
+      agentId: 'usr_admin_01',
       stage: 'negotiation',
       notes: 'Ofertó $850 millones; pendiente respuesta del propietario.',
       createdAt: '2026-11-06T09:30:00.000Z',
@@ -324,9 +314,12 @@ export const SEED_DATA = Object.freeze({
     },
     {
       id: 'lead_005',
-      clientId: 'usr_client_02',
-      agentId: 'usr_admin_01',
+      contactName: 'Mariana López',
+      contactPhone: '+57 312 908 7766',
+      contactEmail: 'mariana.lopez@correo.com',
+      source: 'web',
       propertyId: 'prop_007',
+      agentId: 'usr_agent_03',
       stage: 'closed_won',
       notes: 'Escrituración firmada en notaría.',
       createdAt: '2026-10-20T15:00:00.000Z',
@@ -334,13 +327,42 @@ export const SEED_DATA = Object.freeze({
     },
     {
       id: 'lead_006',
-      clientId: 'usr_client_01',
-      agentId: 'usr_admin_01',
+      contactName: 'Carlos Pérez',
+      contactPhone: '+57 310 444 5566',
+      contactEmail: 'carlos.perez@correo.com',
+      source: 'web',
       propertyId: 'prop_003',
+      agentId: 'usr_admin_01',
       stage: 'closed_lost',
       notes: 'Prefirió una opción más cerca de su trabajo.',
       createdAt: '2026-11-01T16:20:00.000Z',
       updatedAt: '2026-11-09T10:10:00.000Z',
+    },
+    {
+      id: 'lead_007',
+      contactName: 'Sofía Herrera',
+      contactPhone: '',
+      contactEmail: 'sofia.herrera@correo.com',
+      source: 'web',
+      propertyId: 'prop_008',
+      agentId: 'usr_agent_02',
+      stage: 'new',
+      notes: 'Pregunta si admiten mascotas.',
+      createdAt: '2026-11-19T19:45:00.000Z',
+      updatedAt: '2026-11-19T19:45:00.000Z',
+    },
+    {
+      id: 'lead_008',
+      contactName: 'Diego Martínez',
+      contactPhone: '+57 311 555 0198',
+      contactEmail: '',
+      source: 'walk_in',
+      propertyId: 'prop_006',
+      agentId: 'usr_agent_02',
+      stage: 'contacted',
+      notes: 'Necesita la oficina desde enero.',
+      createdAt: '2026-11-15T11:20:00.000Z',
+      updatedAt: '2026-11-17T16:00:00.000Z',
     },
   ],
 });

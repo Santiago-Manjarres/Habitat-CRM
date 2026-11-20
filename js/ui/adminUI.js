@@ -1,35 +1,37 @@
 /**
- * Advisor / admin panel: KPI dashboard, property CRUD (table + modal form),
- * lead funnel (kanban with stage changes and notes) and JSON data tools.
+ * Advisor panel (the only interface): dashboard (next step, KPIs, funnel chart,
+ * recent clients), property CRUD (table + modal form) and client management
+ * (kanban, create / edit / delete). In the interface a lead is called a "cliente".
  */
 import {
-  PROPERTY_TYPES, OPERATION_LABELS, PROPERTY_STATUS_LABELS, LEAD_STAGE_LABELS,
-  STATUS_TONES, SEARCH_DEBOUNCE_MS, ENTITIES,
+  PROPERTY_TYPES, OPERATION_LABELS, PROPERTY_STATUS_LABELS, LEAD_STAGE_LABELS, LEAD_SOURCE_LABELS,
+  STATUS_TONES, SEARCH_DEBOUNCE_MS,
 } from '../config.js';
 import {
   escapeHTML, iconMarkup, badgeMarkup, imageMarkup, formatCurrency, formatCompactCurrency,
-  formatNumber, formatRelativeTime, parseNumber, pluralize,
+  formatNumber, formatRelativeTime, parseNumber, pluralize, getInitials,
 } from '../utils/formatters.js';
-import { validatePropertyData, LIMITS } from '../utils/validators.js';
+import { validatePropertyData, validateLeadData, LIMITS } from '../utils/validators.js';
 import {
   getProperties, getPropertyById, filterProperties, createProperty, updateProperty,
   changePropertyStatus, deleteProperty, countLinkedLeads, normalizePropertyInput,
 } from '../services/propertyService.js';
 import {
-  getLeadsWithDetails, groupLeadsByStage, updateLeadStage, updateLeadNotes, getLeadById,
-  getDashboardKpis, STAGE_OPTIONS,
+  getLeads, getLeadsWithDetails, groupLeadsByStage, updateLeadStage, getLeadById, createLead, updateLead,
+  deleteLead, normalizeLeadInput, getDashboardKpis, getFunnelCounts, getRecentLeads,
+  STAGE_OPTIONS, SOURCE_OPTIONS,
 } from '../services/leadService.js';
-import { exportBackup, importBackup, resetToSeed, getCollection } from '../services/storageService.js';
+import { getAdvisors } from '../services/authService.js';
+import { getCollection } from '../services/storageService.js';
 import { showToast, openModal, confirmDialog } from './toastUI.js';
-import { showFieldErrors, enableLiveValidation, setButtonLoading } from './authUI.js';
+import { showFieldErrors, enableLiveValidation } from './authUI.js';
 
 const state = { user: null, propertyQuery: '', bound: false };
 
 const roots = {
-  summary: () => document.getElementById('admin-summary-root'),
-  properties: () => document.getElementById('admin-properties-root'),
+  summary: () => document.getElementById('admin-resumen-root'),
+  properties: () => document.getElementById('admin-propiedades-root'),
   leads: () => document.getElementById('admin-leads-root'),
-  data: () => document.getElementById('admin-data-root'),
 };
 
 /* ==========================================================================
@@ -66,28 +68,133 @@ function debounce(fn, wait) {
 }
 
 /* ==========================================================================
-   Summary (KPIs)
+   Summary: next step, KPIs, funnel chart, inventory by state, recent clients
    ========================================================================== */
 
 function kpiMarkup({ icon, label, value, hint }) {
   return `
     <article class="card kpi">
-      <h2 class="kpi__label">${iconMarkup(icon, 'icon--sm')}${escapeHTML(label)}</h2>
+      <div class="kpi__head">
+        <h2 class="kpi__label">${escapeHTML(label)}</h2>
+        <span class="kpi__icon">${iconMarkup(icon)}</span>
+      </div>
       <p class="kpi__value">${escapeHTML(value)}</p>
       <p class="kpi__hint">${escapeHTML(hint)}</p>
     </article>`;
 }
 
-function renderSummary() {
+function kpiCards() {
   const k = getDashboardKpis();
-  const cards = [
-    { icon: 'building', label: 'Propiedades', value: formatNumber(k.totalProperties), hint: 'Total en el inventario' },
-    { icon: 'check-circle', label: 'Disponibles', value: formatNumber(k.availableProperties), hint: `${k.availableForSaleCount} en venta · ${k.availableForRentCount} en arriendo` },
-    { icon: 'sparkle', label: 'Valor del inventario disponible', value: formatCompactCurrency(k.availableInventoryValue), hint: `${formatCurrency(k.availableInventoryValue)} en venta` },
-    { icon: 'funnel', label: 'Leads activos', value: formatNumber(k.activeLeads), hint: 'Sin contar los cerrados' },
-    { icon: 'inbox', label: 'Leads nuevos', value: formatNumber(k.newLeads), hint: k.newLeads ? 'Esperan primer contacto' : 'Todo al día' },
+  return [
+    { icon: 'building', label: 'Propiedades disponibles', value: formatNumber(k.availableProperties), hint: `de ${pluralize(k.totalProperties, 'propiedad', 'propiedades')} en el inventario` },
+    { icon: 'sparkle', label: 'Valor del inventario en venta', value: formatCompactCurrency(k.availableInventoryValue), hint: `${formatCurrency(k.availableInventoryValue)} en ${pluralize(k.availableForSaleCount, 'inmueble', 'inmuebles')}` },
+    { icon: 'user', label: 'Clientes en seguimiento', value: formatNumber(k.activeLeads), hint: k.newLeads ? `${pluralize(k.newLeads, 'nuevo', 'nuevos')} por contactar` : 'Todos contactados' },
+    { icon: 'check-circle', label: 'Tasa de cierre', value: k.winRate === null ? '—' : `${k.winRate} %`, hint: k.closedDeals ? `${pluralize(k.wonDeals, 'negocio cerrado', 'negocios cerrados')} de ${pluralize(k.closedDeals, 'terminado', 'terminados')}` : 'Aún no hay negocios terminados' },
   ];
-  roots.summary().innerHTML = `<div class="kpi-grid">${cards.map(kpiMarkup).join('')}</div>`;
+}
+
+/** Vertical bars per funnel stage (SVG; colours come from CSS classes). */
+function funnelChartMarkup() {
+  const data = getFunnelCounts();
+  const max = Math.max(1, ...data.map((d) => d.count));
+  const topIndex = data.findIndex((d) => d.count === max);
+  const [W, H, BAR, TOP] = [500, 200, 56, 24];
+  const step = W / data.length;
+  const bars = data.map((d, i) => {
+    const h = Math.round(((H - TOP - 28) * d.count) / max);
+    const x = Math.round(i * step + (step - BAR) / 2);
+    const y = H - 28 - h;
+    const top = i === topIndex && d.count > 0 ? ' chart__bar--top' : '';
+    return `<rect class="chart__track" x="${x}" y="${TOP}" width="${BAR}" height="${H - 28 - TOP}" rx="10"></rect>
+      <rect class="chart__bar${top}" x="${x}" y="${y}" width="${BAR}" height="${Math.max(h, 0)}" rx="10"></rect>
+      <text class="chart__value" x="${x + BAR / 2}" y="${Math.max(y - 8, 14)}" text-anchor="middle">${d.count}</text>
+      <text class="chart__label" x="${x + BAR / 2}" y="${H - 6}" text-anchor="middle">${escapeHTML(d.label)}</text>`;
+  }).join('');
+  const summary = data.map((d) => `${d.label}: ${d.count}`).join(', ');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Clientes por etapa. ${escapeHTML(summary)}">${bars}</svg>`;
+}
+
+function inventoryMarkup() {
+  const properties = getCollection('properties');
+  const rows = Object.entries(PROPERTY_STATUS_LABELS).map(([status, label]) => {
+    const count = properties.filter((p) => p.status === status).length;
+    const pct = properties.length ? Math.round((count / properties.length) * 100) : 0;
+    return `
+      <li class="meter">
+        <span class="meter__top">${badgeMarkup(label, STATUS_TONES.property[status])}<strong class="tabular">${count}</strong></span>
+        <svg class="meter__bar" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true"><rect class="meter__track" width="100" height="6"></rect><rect class="meter__fill meter__fill--${STATUS_TONES.property[status]}" width="${pct}" height="6"></rect></svg>
+      </li>`;
+  }).join('');
+  return `<ul class="meter-list" role="list">${rows}</ul>`;
+}
+
+function recentLeadRow(lead) {
+  return `
+    <tr>
+      <td class="is-full">
+        <span class="contact-cell">
+          <span class="avatar avatar--sm" aria-hidden="true">${escapeHTML(getInitials(lead.contactName))}</span>
+          <span class="property-cell__text">
+            <span class="property-cell__title">${escapeHTML(lead.contactName)}</span>
+            <span class="text-sm text-muted">${escapeHTML(LEAD_SOURCE_LABELS[lead.source] ?? '—')}</span>
+          </span>
+        </span>
+      </td>
+      <td data-label="Propiedad">${escapeHTML(lead.property?.title ?? 'Propiedad eliminada')}</td>
+      <td data-label="Asesor">${escapeHTML(lead.agent?.name ?? '—')}</td>
+      <td data-label="Etapa">${badgeMarkup(LEAD_STAGE_LABELS[lead.stage], STATUS_TONES.lead[lead.stage])}</td>
+      <td data-label="Actualizado" class="text-muted">${escapeHTML(formatRelativeTime(lead.updatedAt ?? lead.createdAt))}</td>
+      <td class="is-full"><span class="data-table__actions"><button type="button" class="btn btn--ghost btn--sm" data-action="open-lead" data-id="${escapeHTML(lead.id)}">Ver ficha</button></span></td>
+    </tr>`;
+}
+
+function recentLeadsMarkup() {
+  const leads = getRecentLeads(5);
+  if (!leads.length) return '<p class="text-muted">Aún no hay clientes. Registra el primero con «Nuevo cliente».</p>';
+  return `
+    <table class="data-table">
+      <caption class="visually-hidden">Clientes con actividad reciente</caption>
+      <thead><tr><th scope="col">Cliente</th><th scope="col">Propiedad</th><th scope="col">Asesor</th><th scope="col">Etapa</th><th scope="col">Actualizado</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+      <tbody>${leads.map(recentLeadRow).join('')}</tbody>
+    </table>`;
+}
+
+function panelMarkup(title, body, { action = '', className = '' } = {}) {
+  return `
+    <section class="card panel ${className}">
+      <header class="panel__header"><h2 class="panel__title">${title}</h2>${action}</header>
+      ${body}
+    </section>`;
+}
+
+/** The one thing to do today: clients nobody has called yet. */
+function nextStepMarkup() {
+  const pending = getLeads().filter((lead) => lead.stage === 'new').length;
+  const title = pending
+    ? `Tienes ${pluralize(pending, 'cliente nuevo', 'clientes nuevos')} por contactar`
+    : 'Todos los clientes nuevos ya fueron contactados';
+  const hint = pending
+    ? 'Llámalos o escríbeles, y luego cambia su etapa a «Contactado».'
+    : 'Cuando llegue alguien interesado, regístralo con «Nuevo cliente».';
+  return `
+    <section class="next-step" aria-label="Siguiente paso">
+      <span class="next-step__icon">${iconMarkup(pending ? 'phone' : 'check-circle')}</span>
+      <span class="next-step__text"><span class="next-step__title">${escapeHTML(title)}</span><span class="next-step__hint">${escapeHTML(hint)}</span></span>
+      ${pending ? '<a class="btn btn--primary btn--sm" href="#/clientes">Ver clientes por contactar</a>' : ''}
+    </section>`;
+}
+
+function renderSummary() {
+  roots.summary().innerHTML = `
+    <div class="section-stack">
+      ${nextStepMarkup()}
+      <div class="kpi-grid">${kpiCards().map(kpiMarkup).join('')}</div>
+      <div class="dash-grid">
+        ${panelMarkup('Clientes por etapa', funnelChartMarkup(), { className: 'panel--chart', action: '<a class="link-btn" href="#/clientes">Ver clientes</a>' })}
+        ${panelMarkup('Inventario por estado', inventoryMarkup(), { action: '<a class="link-btn" href="#/propiedades">Ver propiedades</a>' })}
+      </div>
+      ${panelMarkup('Últimos movimientos', recentLeadsMarkup(), { className: 'panel--table', action: '<a class="link-btn" href="#/clientes">Ver todos</a>' })}
+    </div>`;
 }
 
 /* ==========================================================================
@@ -165,7 +272,7 @@ function renderPropertyTable() {
   const rows = filterProperties(all, { query: state.propertyQuery });
   document.getElementById('admin-property-count').textContent = pluralize(rows.length, 'propiedad', 'propiedades');
   if (all.length === 0) {
-    container.innerHTML = emptyStateMarkup({ icon: 'building', title: 'Aún no hay propiedades', text: 'Crea la primera para publicarla en el catálogo de clientes.', action: `<button type="button" class="btn btn--primary" data-action="new-property">${iconMarkup('plus')}Crear propiedad</button>` });
+    container.innerHTML = emptyStateMarkup({ icon: 'building', title: 'Aún no hay propiedades', text: 'Registra la primera para empezar a asociarle clientes interesados.', action: `<button type="button" class="btn btn--primary" data-action="new-property">${iconMarkup('plus')}Crear propiedad</button>` });
     return;
   }
   if (rows.length === 0) {
@@ -216,7 +323,7 @@ function propertyFormMarkup(p = {}) {
       ${inputField({ name: 'bedrooms', label: 'Habitaciones', value: p.bedrooms ?? 0, extra: 'inputmode="numeric"' })}
       ${inputField({ name: 'bathrooms', label: 'Baños', value: p.bathrooms ?? 1, extra: 'inputmode="numeric"' })}
       ${inputField({ name: 'parking', label: 'Parqueaderos', value: p.parking ?? 0, extra: 'inputmode="numeric"' })}
-      ${inputField({ name: 'imageUrl', label: 'URL de la imagen <span class="field__optional">(opcional)</span>', value: p.imageUrl, type: 'url', full: true, help: 'Si la imagen no carga, se mostrará una imagen genérica.' })}
+      ${inputField({ name: 'imageUrl', label: 'Enlace de la foto <span class="field__optional">(opcional)</span>', value: p.imageUrl, type: 'url', full: true, help: 'Copia y pega el enlace de una foto publicada en internet. Si no carga, se muestra una imagen genérica.' })}
       <div class="field is-full">
         <label class="field__label" for="pf-description">Descripción <span class="field__optional">(opcional)</span></label>
         <textarea class="field__control" id="pf-description" name="description" maxlength="${LIMITS.descriptionMax}" aria-describedby="pf-description-error">${escapeHTML(p.description ?? '')}</textarea>
@@ -247,7 +354,7 @@ function submitPropertyForm(modal, propertyId) {
     return;
   }
   modal.close();
-  showToast(propertyId ? 'Cambios guardados' : 'Propiedad creada y publicada en el catálogo', { type: 'success' });
+  showToast(propertyId ? 'Cambios guardados' : 'Propiedad creada', { type: 'success' });
 }
 
 function openPropertyForm(propertyId = null) {
@@ -279,10 +386,10 @@ async function handleDeleteProperty(propertyId) {
   const property = getPropertyById(propertyId);
   if (!property) return;
   const linked = countLinkedLeads(propertyId);
-  const leadsNote = linked ? ` También se ${linked === 1 ? 'eliminará' : 'eliminarán'} ${escapeHTML(pluralize(linked, 'lead asociado', 'leads asociados'))}.` : '';
+  const leadsNote = linked ? ` También se ${linked === 1 ? 'eliminará' : 'eliminarán'} ${escapeHTML(pluralize(linked, 'cliente interesado', 'clientes interesados'))}.` : '';
   const confirmed = await confirmDialog({
     title: 'Eliminar propiedad',
-    messageHTML: `Se eliminará <strong>${escapeHTML(property.title)}</strong>. Esta acción no se puede deshacer.${leadsNote}`,
+    messageHTML: `Se eliminará <strong>${escapeHTML(property.title)}</strong>.${leadsNote} Esta acción no se puede deshacer.`,
     confirmLabel: 'Eliminar',
   });
   if (!confirmed) return;
@@ -323,31 +430,45 @@ function bindPropertiesRoot(root) {
 }
 
 /* ==========================================================================
-   Leads (kanban)
+   Clients (leads): kanban + create / edit / delete
    ========================================================================== */
+
+function contactLinksMarkup(lead) {
+  const phone = String(lead.contactPhone ?? '').replace(/[^\d+]/g, '');
+  const links = [
+    phone ? `<a class="link-btn" href="tel:${escapeHTML(phone)}">${iconMarkup('phone', 'icon--sm')}${escapeHTML(lead.contactPhone)}</a>` : '',
+    lead.contactEmail ? `<a class="link-btn" href="mailto:${escapeHTML(lead.contactEmail)}">${iconMarkup('mail', 'icon--sm')}${escapeHTML(lead.contactEmail)}</a>` : '',
+  ].filter(Boolean);
+  return links.join('');
+}
 
 function leadCardMarkup(lead) {
   const id = escapeHTML(lead.id);
-  const clientName = lead.client?.name ?? 'Cliente eliminado';
   return `
-    <article class="card lead-card" aria-label="${escapeHTML(clientName)}">
+    <article class="card lead-card" aria-label="${escapeHTML(lead.contactName)}">
       <div class="lead-card__head">
-        <span class="avatar" aria-hidden="true">${escapeHTML(lead.client?.avatar ?? '?')}</span>
+        <span class="avatar" aria-hidden="true">${escapeHTML(getInitials(lead.contactName))}</span>
         <div class="property-cell__text">
-          <span class="lead-card__name">${escapeHTML(clientName)}</span>
+          <span class="lead-card__name">${escapeHTML(lead.contactName)}</span>
           <span class="lead-card__property">${escapeHTML(lead.property?.title ?? 'Propiedad eliminada')}</span>
         </div>
       </div>
       ${badgeMarkup(LEAD_STAGE_LABELS[lead.stage], STATUS_TONES.lead[lead.stage])}
-      <p class="lead-card__notes${lead.notes ? '' : ' text-muted'}">${escapeHTML(lead.notes || 'Sin notas comerciales')}</p>
-      <div class="lead-card__meta"><span>Actualizado ${escapeHTML(formatRelativeTime(lead.updatedAt ?? lead.createdAt))}</span></div>
+      <p class="lead-card__notes${lead.notes ? '' : ' text-muted'}">${escapeHTML(lead.notes || 'Sin notas')}</p>
+      <div class="lead-card__meta">
+        <span>${escapeHTML(LEAD_SOURCE_LABELS[lead.source] ?? '—')} · ${escapeHTML(formatRelativeTime(lead.updatedAt ?? lead.createdAt))}</span>
+        <span class="avatar avatar--xs" title="${escapeHTML(lead.agent?.name ?? '')}" aria-label="Asesor: ${escapeHTML(lead.agent?.name ?? 'sin asignar')}">${escapeHTML(lead.agent?.avatar ?? '?')}</span>
+      </div>
       <div class="lead-card__actions">
-        <div class="field__select field__select--sm">
-          <select class="field__control field__control--sm" data-action="stage" data-id="${id}" data-focus-key="stage-${id}" aria-label="Etapa de ${escapeHTML(clientName)}">
-            ${optionsMarkup(STAGE_OPTIONS.map(({ value, label }) => [value, label]), lead.stage)}
-          </select>
+        <div class="lead-card__stage">
+          <label class="field__label" for="stage-${id}">Cambiar etapa</label>
+          <div class="field__select field__select--sm">
+            <select class="field__control field__control--sm" id="stage-${id}" data-action="stage" data-id="${id}" data-focus-key="stage-${id}">
+              ${optionsMarkup(STAGE_OPTIONS.map(({ value, label }) => [value, label]), lead.stage)}
+            </select>
+          </div>
         </div>
-        <button type="button" class="btn btn--secondary btn--sm" data-action="lead-notes" data-id="${id}" data-focus-key="notes-${id}">${iconMarkup('note', 'icon--sm')}Notas</button>
+        <button type="button" class="btn btn--secondary btn--sm" data-action="open-lead" data-id="${id}" data-focus-key="open-${id}">${iconMarkup('note', 'icon--sm')}Ver ficha</button>
       </div>
     </article>`;
 }
@@ -358,170 +479,123 @@ function kanbanColumnMarkup(column) {
     <section class="kanban__column" aria-labelledby="${titleId}">
       <header class="kanban__header">
         <h2 class="kanban__title" id="${titleId}">${escapeHTML(column.label)}</h2>
-        <span class="kanban__count" aria-label="${escapeHTML(pluralize(column.leads.length, 'lead', 'leads'))}">${column.leads.length}</span>
+        <span class="kanban__count" aria-label="${escapeHTML(pluralize(column.leads.length, 'cliente', 'clientes'))}">${column.leads.length}</span>
       </header>
-      ${column.leads.length ? column.leads.map(leadCardMarkup).join('') : '<p class="kanban__empty">Sin leads en esta etapa</p>'}
+      ${column.leads.length ? column.leads.map(leadCardMarkup).join('') : '<p class="kanban__empty">Nadie en esta etapa</p>'}
     </section>`;
 }
 
 function renderLeads() {
   const leads = getLeadsWithDetails();
   if (leads.length === 0) {
-    roots.leads().innerHTML = emptyStateMarkup({ icon: 'funnel', title: 'Aún no hay leads', text: 'Cuando un cliente pulse «Me interesa» en una propiedad, aparecerá aquí en la columna Nuevo.' });
+    roots.leads().innerHTML = emptyStateMarkup({ icon: 'funnel', title: 'Aún no hay clientes', text: 'Cada persona que llame, escriba o visite la oficina por una propiedad se registra aquí para seguirla hasta el cierre.', action: `<button type="button" class="btn btn--primary" data-action="new-lead">${iconMarkup('plus')}Registrar el primer cliente</button>` });
     return;
   }
   renderKeepingFocus(roots.leads(), `<div class="kanban">${groupLeadsByStage(leads).map(kanbanColumnMarkup).join('')}</div>`);
 }
 
-function leadModalBody(lead) {
-  const client = lead.client ?? {};
-  const phone = String(client.phone ?? '').replace(/[^\d+]/g, '');
+/* ---------- Lead form (create / edit) ---------- */
+
+function leadField({ name, label, value = '', type = 'text', full = false, help = '', extra = '' }) {
+  const id = `lf-${name}`;
   return `
-    <div class="contact-card">
-      <span class="avatar" aria-hidden="true">${escapeHTML(client.avatar ?? '?')}</span>
-      <span class="contact-card__text">
-        <span class="contact-card__label">Interesado en</span>
-        <strong>${escapeHTML(lead.property?.title ?? 'Propiedad eliminada')}</strong>
-      </span>
-      <span class="contact-card__links">
-        ${client.email ? `<a class="link-btn" href="mailto:${escapeHTML(client.email)}">${iconMarkup('mail', 'icon--sm')}${escapeHTML(client.email)}</a>` : ''}
-        ${phone ? `<a class="link-btn" href="tel:${escapeHTML(phone)}">${iconMarkup('phone', 'icon--sm')}${escapeHTML(client.phone)}</a>` : ''}
-      </span>
-    </div>
-    <form id="lead-notes-form" class="form-grid" novalidate>
-      <div class="field">
-        <label class="field__label" for="lead-notes">Notas comerciales</label>
-        <textarea class="field__control" id="lead-notes" name="notes" maxlength="${LIMITS.notesMax}" aria-describedby="lead-notes-help lead-notes-error" autofocus>${escapeHTML(lead.notes ?? '')}</textarea>
-        <span class="field__help" id="lead-notes-help">Máximo ${LIMITS.notesMax} caracteres. Solo las ve el equipo comercial.</span>
-        <span class="field__error" id="lead-notes-error"></span>
+    <div class="field${full ? ' is-full' : ''}">
+      <label class="field__label" for="${id}">${label}</label>
+      <input class="field__control" id="${id}" name="${name}" type="${type}" value="${escapeHTML(value)}" aria-describedby="${help ? `${id}-help ` : ''}${id}-error" ${extra}>
+      ${help ? `<span class="field__help" id="${id}-help">${help}</span>` : ''}
+      <span class="field__error" id="${id}-error"></span>
+    </div>`;
+}
+
+function leadSelect(name, label, entries, selected, full = false) {
+  const id = `lf-${name}`;
+  return `
+    <div class="field${full ? ' is-full' : ''}">
+      <label class="field__label" for="${id}">${label}</label>
+      <div class="field__select"><select class="field__control" id="${id}" name="${name}" aria-describedby="${id}-error">${optionsMarkup(entries, selected)}</select></div>
+      <span class="field__error" id="${id}-error"></span>
+    </div>`;
+}
+
+function propertyOptions(currentId) {
+  return getProperties()
+    .filter((p) => p.status !== 'sold' || p.id === currentId)
+    .map((p) => [p.id, `${p.title} · ${formatCurrency(p.price, p.currency)}`]);
+}
+
+function leadFormMarkup(lead = {}) {
+  const advisors = getAdvisors().map((a) => [a.id, a.name]);
+  return `
+    ${lead.id ? `<div class="contact-card"><span class="contact-card__text"><span class="contact-card__label">Contactar</span></span><span class="contact-card__links">${contactLinksMarkup(lead) || '<span class="text-muted">Sin datos de contacto</span>'}</span></div>` : ''}
+    <form id="lead-form" class="form-grid form-grid--2" novalidate>
+      ${leadField({ name: 'contactName', label: 'Nombre del cliente', value: lead.contactName, full: true, extra: `maxlength="${LIMITS.nameMax}" autocomplete="off" autofocus` })}
+      ${leadField({ name: 'contactPhone', label: 'Teléfono', value: lead.contactPhone, type: 'tel', extra: 'inputmode="tel" autocomplete="off"', help: 'Teléfono o correo: al menos uno.' })}
+      ${leadField({ name: 'contactEmail', label: 'Correo', value: lead.contactEmail, type: 'email', extra: 'inputmode="email" autocomplete="off"' })}
+      ${leadSelect('propertyId', 'Propiedad de interés', propertyOptions(lead.propertyId), lead.propertyId, true)}
+      ${leadSelect('source', '¿Cómo llegó?', SOURCE_OPTIONS.map(({ value, label }) => [value, label]), lead.source ?? 'phone')}
+      ${leadSelect('stage', 'Etapa', STAGE_OPTIONS.map(({ value, label }) => [value, label]), lead.stage ?? 'new')}
+      ${leadSelect('agentId', 'Asesor responsable', advisors, lead.agentId ?? state.user.id, true)}
+      <div class="field is-full">
+        <label class="field__label" for="lf-notes">Notas <span class="field__optional">(opcional)</span></label>
+        <textarea class="field__control" id="lf-notes" name="notes" maxlength="${LIMITS.notesMax}" aria-describedby="lf-notes-error">${escapeHTML(lead.notes ?? '')}</textarea>
+        <span class="field__error" id="lf-notes-error"></span>
       </div>
     </form>`;
 }
 
-function openLeadNotes(leadId) {
-  const lead = getLeadsWithDetails().find((item) => item.id === leadId);
-  if (!lead) return;
-  const modal = openModal({
-    title: lead.client?.name ?? 'Lead',
-    body: leadModalBody(lead),
-    footer: `
-      <button type="button" class="btn btn--secondary" data-close>Cancelar</button>
-      <button type="submit" class="btn btn--primary" form="lead-notes-form">Guardar notas</button>`,
+function leadFooterMarkup(isEdit) {
+  return `
+    ${isEdit ? '<button type="button" class="btn btn--ghost modal__footer-start" data-action="delete-lead">' + iconMarkup('trash', 'icon--sm') + 'Eliminar</button>' : ''}
+    <button type="button" class="btn btn--secondary" data-close>Cancelar</button>
+    <button type="submit" class="btn btn--primary" form="lead-form">${isEdit ? 'Guardar cambios' : 'Guardar cliente'}</button>`;
+}
+
+function submitLeadForm(modal, leadId) {
+  const form = modal.element.querySelector('#lead-form');
+  const values = Object.fromEntries(new FormData(form).entries());
+  const result = leadId ? updateLead(leadId, values) : createLead(values);
+  if (!result.ok) {
+    showFieldErrors(form, result.errors)?.focus();
+    enableLiveValidation(form, () => validateLeadData(normalizeLeadInput(Object.fromEntries(new FormData(form).entries()))).errors);
+    if (result.errors._form) showToast(result.errors._form, { type: 'error' });
+    return;
+  }
+  modal.close();
+  showToast(leadId ? 'Cambios guardados' : `Cliente registrado: ${result.lead.contactName}`, { type: 'success' });
+}
+
+async function handleDeleteLead(modal, lead) {
+  const confirmed = await confirmDialog({
+    title: 'Eliminar cliente',
+    messageHTML: `Se eliminará la ficha de <strong>${escapeHTML(lead.contactName)}</strong>. Esta acción no se puede deshacer.`,
+    confirmLabel: 'Eliminar',
   });
-  modal.element.querySelector('#lead-notes-form').addEventListener('submit', (event) => {
+  if (!confirmed) return;
+  const result = deleteLead(lead.id);
+  modal.close();
+  showToast(result.ok ? 'Cliente eliminado' : result.error, { type: result.ok ? 'success' : 'error' });
+}
+
+function openLeadForm(leadId = null) {
+  const lead = leadId ? getLeadById(leadId) : null;
+  if (leadId && !lead) {
+    showToast('Este cliente ya no existe', { type: 'warning' });
+    return;
+  }
+  const modal = openModal({ title: lead ? lead.contactName : 'Nuevo cliente', body: leadFormMarkup(lead ?? {}), footer: leadFooterMarkup(Boolean(lead)) });
+  modal.element.querySelector('#lead-form').addEventListener('submit', (event) => {
     event.preventDefault();
-    const result = updateLeadNotes(leadId, event.currentTarget.elements.notes.value);
-    if (!result.ok) {
-      showFieldErrors(event.currentTarget, { notes: result.error })?.focus();
-      return;
-    }
-    modal.close();
-    showToast('Notas guardadas', { type: 'success' });
+    submitLeadForm(modal, leadId);
   });
+  modal.element.querySelector('[data-action="delete-lead"]')?.addEventListener('click', () => handleDeleteLead(modal, lead));
 }
 
 function bindLeadsRoot(root) {
   root.addEventListener('change', (event) => {
     if (event.target.dataset.action !== 'stage') return;
     const result = updateLeadStage(event.target.dataset.id, event.target.value);
-    showToast(result.ok ? `Lead movido a «${LEAD_STAGE_LABELS[event.target.value]}»` : result.error, { type: result.ok ? 'success' : 'error' });
+    showToast(result.ok ? `Etapa cambiada a «${LEAD_STAGE_LABELS[event.target.value]}»` : result.error, { type: result.ok ? 'success' : 'error' });
   });
-  root.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-action="lead-notes"]');
-    if (button && getLeadById(button.dataset.id)) openLeadNotes(button.dataset.id);
-  });
-}
-
-/* ==========================================================================
-   Data tools (export / import / restore)
-   ========================================================================== */
-
-const ENTITY_LABELS = { users: ['usuario', 'usuarios'], properties: ['propiedad', 'propiedades'], leads: ['lead', 'leads'] };
-
-function countsMarkup() {
-  return ENTITIES.map((entity) => {
-    const count = getCollection(entity).length;
-    const [one, many] = ENTITY_LABELS[entity];
-    return `<span><strong>${formatNumber(count)}</strong> ${count === 1 ? one : many}</span>`;
-  }).join('');
-}
-
-function toolMarkup({ icon, danger = false, title, text, action }) {
-  return `
-    <article class="card tool">
-      <span class="tool__icon${danger ? ' tool__icon--danger' : ''}">${iconMarkup(icon)}</span>
-      <h2>${title}</h2>
-      <p class="tool__text">${text}</p>
-      ${action}
-    </article>`;
-}
-
-function renderDataTools() {
-  roots.data().innerHTML = `
-    <div class="section-stack">
-      <p class="stat-list" id="data-counts" aria-live="polite">${countsMarkup()}</p>
-      <div class="tool-grid">
-        ${toolMarkup({ icon: 'download', title: 'Exportar respaldo', text: 'Descarga un archivo JSON con usuarios, propiedades y leads tal como están ahora.', action: `<button type="button" class="btn btn--secondary" data-action="export">${iconMarkup('download', 'icon--sm')}Exportar JSON</button>` })}
-        ${toolMarkup({ icon: 'upload', title: 'Importar respaldo', text: 'Carga un archivo exportado antes. Se valida su estructura antes de aplicarlo.', action: `<input type="file" id="import-file" class="visually-hidden" accept="application/json,.json" tabindex="-1"><button type="button" class="btn btn--secondary" data-action="import">${iconMarkup('upload', 'icon--sm')}Importar JSON</button>` })}
-        ${toolMarkup({ icon: 'refresh', danger: true, title: 'Restaurar datos de fábrica', text: 'Vuelve a los datos originales de la carpeta /data/. Se perderán los cambios hechos.', action: `<button type="button" class="btn btn--danger" data-action="reset">${iconMarkup('refresh', 'icon--sm')}Restaurar datos</button>` })}
-      </div>
-    </div>`;
-}
-
-function handleExport() {
-  try {
-    const fileName = exportBackup();
-    showToast(`Respaldo descargado: ${fileName}`, { type: 'success' });
-  } catch (error) {
-    showToast('No se pudo generar el respaldo. Inténtalo de nuevo', { type: 'error' });
-  }
-}
-
-async function handleImportFile(input) {
-  const file = input.files?.[0];
-  input.value = '';
-  if (!file) return;
-  const confirmed = await confirmDialog({
-    title: 'Importar respaldo',
-    messageHTML: `Se reemplazarán todos los datos actuales por los del archivo <strong>${escapeHTML(file.name)}</strong>. Esta acción no se puede deshacer.`,
-    confirmLabel: 'Importar',
-  });
-  if (!confirmed) return;
-  const result = importBackup(await file.text());
-  if (!result.ok) {
-    showToast(`No se importó el archivo: ${result.error}`, { type: 'error' });
-    return;
-  }
-  const { properties, leads, users } = result.counts;
-  showToast(`Respaldo importado: ${pluralize(properties, 'propiedad', 'propiedades')}, ${pluralize(leads, 'lead', 'leads')} y ${pluralize(users, 'usuario', 'usuarios')}`, { type: 'success' });
-}
-
-async function handleReset(button) {
-  const confirmed = await confirmDialog({
-    title: 'Restaurar datos de fábrica',
-    messageHTML: 'Se borrarán todos los cambios y se cargarán de nuevo los datos originales. Esta acción no se puede deshacer.',
-    confirmLabel: 'Restaurar',
-  });
-  if (!confirmed) return;
-  setButtonLoading(button, true);
-  try {
-    await resetToSeed();
-    showToast('Datos restaurados a su estado original', { type: 'success' });
-  } catch (error) {
-    showToast('No se pudieron restaurar los datos. Inténtalo de nuevo', { type: 'error' });
-  } finally {
-    if (button.isConnected) setButtonLoading(button, false);
-  }
-}
-
-function bindDataRoot(root) {
-  root.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-action]');
-    if (button?.dataset.action === 'export') handleExport();
-    if (button?.dataset.action === 'import') document.getElementById('import-file').click();
-    if (button?.dataset.action === 'reset') handleReset(button);
-  });
-  root.addEventListener('change', (event) => { if (event.target.id === 'import-file') handleImportFile(event.target); });
 }
 
 /* ==========================================================================
@@ -534,27 +608,43 @@ function skeletonRows(count) {
 
 /** Loading state shown while seed data is being prepared. */
 export function renderAdminLoading() {
-  roots.summary().innerHTML = `<div class="kpi-grid" role="status" aria-label="Cargando indicadores">${'<div class="card kpi" aria-hidden="true"><div class="skeleton skeleton--w60"></div><div class="skeleton skeleton--w40"></div></div>'.repeat(5)}</div>`;
-  ['properties', 'leads', 'data'].forEach((key) => { roots[key]().innerHTML = skeletonRows(4); });
+  roots.summary().innerHTML = `<div class="kpi-grid" role="status" aria-label="Cargando indicadores">${'<div class="card kpi" aria-hidden="true"><div class="skeleton skeleton--w60"></div><div class="skeleton skeleton--w40"></div></div>'.repeat(4)}</div>`;
+  ['properties', 'leads'].forEach((key) => { roots[key]().innerHTML = skeletonRows(4); });
+}
+
+/** One delegated listener for the actions that live in several sections. */
+function bindViewActions() {
+  document.getElementById('view-admin').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-action="new-lead"], [data-action="open-lead"]');
+    if (!button) return;
+    openLeadForm(button.dataset.action === 'open-lead' ? button.dataset.id : null);
+  });
 }
 
 function bindRoots() {
   if (state.bound) return;
   state.bound = true;
+  bindViewActions();
   bindPropertiesRoot(roots.properties());
   bindLeadsRoot(roots.leads());
-  bindDataRoot(roots.data());
+}
+
+function renderToday() {
+  const today = document.getElementById('topbar-date');
+  if (!today) return;
+  const text = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+  today.textContent = text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export function mountAdminUI(user) {
   state.user = user;
   state.propertyQuery = '';
   bindRoots();
+  renderToday();
   roots.properties().innerHTML = propertiesShellMarkup();
   renderSummary();
   renderPropertyTable();
   renderLeads();
-  renderDataTools();
 }
 
 /** Re-renders only the blocks that depend on the changed entity. */
@@ -563,8 +653,6 @@ export function refreshAdminUI(entity) {
   renderSummary();
   if (['properties', 'all'].includes(entity)) renderPropertyTable();
   if (['leads', 'properties', 'users', 'all'].includes(entity)) renderLeads();
-  const counts = document.getElementById('data-counts');
-  if (counts) counts.innerHTML = countsMarkup();
 }
 
 export function unmountAdminUI() {

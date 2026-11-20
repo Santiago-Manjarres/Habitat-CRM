@@ -1,11 +1,11 @@
 /* ==========================================================================
    Habitat CRM — Design tokens (Spec §9.3)
    The ONLY file allowed to declare literal colors, radii, shadows, durations.
-   Adjustments agreed with the product owner:
-   - Accent taken from the Habitat logo blue (#2667CC) instead of indigo.
-   - Base text size is 14px across all views (form fields 16px on mobile only).
-   - Font family: SF Pro Display (self-hosted) with system-ui fallback.
-   - Light theme only (no dark mode).
+   Direction agreed with the product owner (references: CRMPro / Valtro):
+   - White surfaces on a cool light ground; the Habitat logo blue (#2667CC) is the
+     one accent (primary buttons, active navigation, charts).
+   - Geist (OFL, self-hosted) for everything; base text 14px (fields 16px on mobile).
+   - Pill buttons, soft cards (16px radius), light theme only.
    ========================================================================== */
 
 :root {
@@ -16,17 +16,19 @@
   --color-on-accent: #ffffff;        /* text/icons on accent or danger fills */
 
   /* Neutrals */
-  --color-bg: #f7f8fa;               /* app background */
+  --color-bg: #f5f6fa;               /* app background */
   --color-surface: #ffffff;          /* cards, modals */
-  --color-surface-muted: #f1f3f6;    /* table headers, row hover */
-  --color-border: #e3e6eb;
+  --color-surface-muted: #f3f5f9;    /* table headers, row hover, chart tracks */
+  --color-border: #e7eaf0;
   --color-border-strong: #c9ced6;    /* form control borders (>= 3:1 not required for borders, aids clarity) */
-  --color-text: #1a1f2b;
+  --color-border-hover: #cdd2da;     /* a linked card's border, one step darker on hover */
+  --color-text: #1b1f27;
   --color-text-muted: #5b6475;       /* >= 4.5:1 on --color-surface (5.96:1) */
   --color-text-faint: #8a93a3;       /* 3.1:1 — decorative icons only, never body text */
   --color-neutral: #4a5263;          /* neutral badge text (closed_lost) */
   --color-neutral-bg: #eef0f3;
   --color-skeleton: #e9ecf0;
+  --color-chart-soft: #c9daf6;       /* chart bars that are not the highlight */
   --color-backdrop: rgba(16, 24, 40, 0.32);
 
   /* Semantic (property and lead states) */
@@ -37,14 +39,17 @@
   --color-info:    #1d5fd0;  --color-info-bg:    #e8f0fe;   /* New, Contacted */
 
   /* Typography */
-  --font-sans: "SF Pro Display", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-display: var(--font-sans);  /* titles and figures share the one family */
+  --tracking-display: -0.025em;
   --text-xs: 12px;  --text-sm: 13px;  --text-base: 14px;
   --text-md: 16px;  --text-lg: 20px;  --text-xl: 28px;
   --text-field-mobile: 16px;         /* form fields on mobile: prevents iOS zoom on focus (Spec §9.5) */
   --weight-regular: 400;
   --weight-medium: 500;
-  --weight-strong: 700;              /* SF Pro Display ships no upright Semibold */
+  --weight-strong: 600;
+  --weight-figure: 600;              /* KPI values and figures */
   --leading-body: 1.5;
   --leading-tight: 1.2;
   --tracking-tight: -0.01em;
@@ -66,17 +71,17 @@
 
   /* Radii */
   --radius-none: 0;
-  --radius-sm: 6px;   /* buttons, inputs, badges */
-  --radius-md: 10px;  /* cards */
-  --radius-lg: 14px;  /* modals */
+  --radius-sm: 10px;  /* inputs, small tiles */
+  --radius-md: 16px;  /* cards, panels */
+  --radius-lg: 20px;  /* modals */
   --radius-full: 999px;
 
   /* Shadows (the "border" is a 1px shadow) */
   --shadow-border: 0 0 0 1px var(--color-border);
   --shadow-field: 0 0 0 1px var(--color-border-strong);
   --shadow-field-error: 0 0 0 1px var(--color-danger);
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, .06), 0 0 0 1px var(--color-border);
-  --shadow-md: 0 4px 12px rgba(16, 24, 40, .08), 0 0 0 1px var(--color-border);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, .04), 0 0 0 1px var(--color-border);
+  --shadow-md: 0 8px 24px rgba(16, 24, 40, .06), 0 0 0 1px var(--color-border);
   --shadow-lg: 0 16px 40px rgba(16, 24, 40, .16);
   --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-accent);
   --focus-ring-error: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-danger);
@@ -84,6 +89,7 @@
   --shadow-divider-bottom: 0 1px 0 var(--color-border);
   --shadow-divider-top: 0 -1px 0 var(--color-border);
   --shadow-divider-right: 1px 0 0 var(--color-border);
+  --shadow-hover: 0 8px 24px rgba(16, 24, 40, .08), 0 0 0 1px var(--color-border-hover); /* linked card on hover only */
 
   /* Motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -92,6 +98,7 @@
   --duration-fast: 160ms;    /* hover, tooltips, chat-like inserts */
   --duration-base: 220ms;    /* menus, dropdowns */
   --duration-modal: 280ms;   /* modals and panels */
+  --duration-photo: 280ms;   /* a photograph zooming 1.03 inside its frame (kept under the 300ms cap) */
   --duration-exit: 180ms;    /* exits are faster than entries */
   --duration-spin: 700ms;    /* continuous spinner rotation (linear) */
   --duration-pulse: 1400ms;  /* continuous skeleton pulse */

@@ -90,29 +90,77 @@
    -------------------------------------------------------------------------- */
 .view-login {
   display: grid;
-  place-items: center;
-  padding: var(--space-5) var(--space-4) calc(var(--space-5) + env(safe-area-inset-bottom));
+  grid-template-rows: auto 1fr;
+  background-color: var(--color-surface);
+}
+
+/* The photograph leads: a band on phones and tablets, the left half on desktop */
+.login-media {
+  height: 200px;
+  overflow: hidden;
+  background-color: var(--color-skeleton);
+}
+
+.login-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 40% 62%;
+}
+
+.login-panel {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  padding: var(--space-6) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 1024px) {
+  .view-login {
+    grid-template-rows: none;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+
+  .login-media {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+  }
+
+  .login-panel {
+    align-content: center;
+    padding: var(--space-7);
+  }
 }
 
 .auth-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-5);
-  width: min(100%, 420px);
-  padding: var(--space-5);
-  box-shadow: var(--shadow-md);
-}
-
-@media (min-width: 640px) {
-  .auth-card { padding: var(--space-6); }
+  width: min(100%, 400px);
 }
 
 .auth-card__header {
   display: grid;
-  justify-items: center;
-  gap: var(--space-3);
-  text-align: center;
+  gap: var(--space-5);
 }
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-2);
+  min-height: var(--control-h);
+  color: var(--color-text);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-tight);
+}
+
+.auth-card__header h1 { font-size: var(--text-xl); }
+
+.auth-back { justify-self: start; }
 
 .auth-card__logo {
   width: var(--space-7);
@@ -133,15 +181,18 @@
 }
 
 .auth-demo__label {
-  text-align: center;
   font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
 
 .auth-demo__buttons {
   display: grid;
+  justify-items: start;
   gap: var(--space-1);
+  margin-inline: calc(var(--space-3) * -1); /* ghost buttons: text on the form's left edge */
 }
+
+.auth-demo__buttons .btn { padding-inline: var(--space-3); }
 
 @media (min-width: 640px) {
   .auth-demo__buttons .btn { font-size: var(--text-sm); }
@@ -329,10 +380,12 @@
     box-shadow: var(--shadow-divider-right);
   }
 
-  .admin-layout .app-header--mobile,
   .admin-layout .bottom-nav { display: none; }
   .admin-layout .has-bottom-nav { padding-bottom: 0; }
+  .topbar__brand { display: none; }
 }
+
+.admin-main { min-width: 0; }
 
 .sidebar .brand { padding-inline: var(--space-3); }
 
@@ -341,20 +394,33 @@
   gap: var(--space-1);
 }
 
-.sidebar__nav .nav-link { min-height: var(--control-h-desktop); }
-
-.sidebar__footer {
-  margin-top: auto;
-  display: grid;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-muted);
+.sidebar__nav .nav-link,
+.sidebar__site {
+  min-height: var(--control-h);
+  padding-inline: var(--space-4);
+  border-radius: var(--radius-full);
 }
 
-.sidebar__footer .logout-btn { width: 100%; justify-content: flex-start; }
-.sidebar__footer .logout-btn__label { display: inline; }
-.sidebar__footer .user-chip__text { display: grid; }
+/* Active item: the one filled accent pill in the navigation */
+.sidebar__nav .nav-link[aria-current="page"] {
+  color: var(--color-on-accent);
+  background-color: var(--color-accent);
+}
+
+.sidebar__site { margin-top: auto; }
+
+/* Top bar: the advisor's chip and sign-out, at every width */
+.topbar .app-header__inner { min-height: 64px; }
+
+.topbar__date {
+  display: none;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 1024px) {
+  .topbar__date { display: block; }
+}
 
 /* --------------------------------------------------------------------------
    Page sections

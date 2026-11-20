@@ -1,328 +1,277 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-type="software" data-radius="soft" data-ground="sky" data-buttons="pill" data-motion>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Habitat CRM: catálogo de inmuebles y gestión comercial para la inmobiliaria.">
-  <title>Habitat CRM</title>
-  <link rel="icon" type="image/png" href="./assets/img/logo.png">
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/layout.css">
-  <script type="module" src="./js/app.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habitat CRM: el CRM para inmobiliarias</title>
+<meta name="description" content="Habitat CRM reúne las propiedades, los clientes interesados y cada negocio de tu inmobiliaria en un solo lugar, para todo el equipo de asesores.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Habitat CRM: el CRM para inmobiliarias">
+<meta property="og:description" content="Propiedades, clientes y negocios de tu inmobiliaria en un solo lugar.">
+<meta property="og:image" content="share.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/img/logo.png" type="image/png">
+<meta name="theme-color" content="#ffffff">
+<!-- <link rel="canonical" href="https://[dominio del cliente]/"> -->
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
+<style>
+:root {
+  --p-bg: #ffffff; --p-surface: #f5f6fa; --p-ink: #1b1f27; --p-muted: #474e5c;
+  --p-accent: #2667cc; --p-accent-ink: #ffffff; --p-action: #2667cc; --p-action-ink: #ffffff;
+  --p-inv-bg: #1b1f27; --p-inv-surface: #282c34; --p-inv-ink: #ffffff; --p-inv-muted: #a0a2a6;
+  --p-inv-accent: #2667cc; --p-inv-accent-ink: #ffffff; --p-inv-action: #2667cc; --p-inv-action-ink: #ffffff;
+  --font-display: "Geist", system-ui, sans-serif;
+  --font-text: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.035em;
+  --display-tracking-xl: -0.045em;
+}
+</style>
+<link rel="stylesheet" href="assets/ui/base.css">
+<link rel="stylesheet" href="css/landing.css">
+<script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+<script src="assets/backgrounds/backgrounds.js"></script>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+<link rel="modulepreload" href="assets/moments/moments.js">
+<link rel="modulepreload" href="assets/moments/lib.js">
+<link rel="modulepreload" href="assets/moments/marquee-row/moment.js">
 </head>
 <body>
-  <!-- Inline copy of assets/icons/sprite.svg (external <use> references fail on file://). Do not edit here. -->
-  <svg class="icon-sprite" aria-hidden="true" focusable="false">
-    <!-- SPRITE:START -->
-    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
-    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.6 5.6A9.7 9.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.7 3.5M6.6 6.6C3.9 8.3 2.5 12 2.5 12s3.5 6.5 9.5 6.5c1.9 0 3.5-.6 4.9-1.5"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></symbol>
-    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></symbol>
-    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 4.5h3.5a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H14"/><path d="M10 16.5 5.5 12 10 7.5"/><path d="M5.5 12H15"/></symbol>
-    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7"/><path d="M5.5 9v11.5h13V9"/><path d="M10 20.5v-6h4v6"/></symbol>
-    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3.5 13.5 6 5.5h12l2.5 8v5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/><path d="M3.5 13.5H8l1.5 2.5h5l1.5-2.5h4.5"/></symbol>
-    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></symbol>
-    <symbol id="i-building" viewBox="0 0 24 24"><path d="M4.5 20.5v-15a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v15"/><path d="M15.5 9.5h2a2 2 0 0 1 2 2v9"/><path d="M3 20.5h18"/><path d="M8 7.5h4M8 11h4M8 14.5h4"/></symbol>
-    <symbol id="i-funnel" viewBox="0 0 24 24"><path d="M3.5 4.5h17l-6.5 8v6l-4 2v-8Z"/></symbol>
-    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.5"/><path d="M4.5 5.5v13c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-13"/><path d="M4.5 12c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5"/></symbol>
-    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20.5 20.5-4.9-4.9"/></symbol>
-    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
-    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12.2 2.4 2.3 4.6-5"/></symbol>
-    <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5"/><path d="M12 16.2v.1"/></symbol>
-    <symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="M10.3 4.3 2.9 17.5a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z"/><path d="M12 9.5v4"/><path d="M12 16.8v.1"/></symbol>
-    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><path d="M12 7.8v.1"/></symbol>
-    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M15.5 4.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/><path d="m13.5 6.5 3 3"/></symbol>
-    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 6.5h16"/><path d="M9 6.5V4.5h6v2"/><path d="M6 6.5l1 13a1.5 1.5 0 0 0 1.5 1.5h7a1.5 1.5 0 0 0 1.5-1.5l1-13"/><path d="M10 10.5v6M14 10.5v6"/></symbol>
-    <symbol id="i-more" viewBox="0 0 24 24"><path d="M12 6.2v.1M12 12v.1M12 17.8v.1"/></symbol>
-    <symbol id="i-area" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
-    <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18.5v-12M3 14.5h18v4"/><path d="M21 14.5v-3a2.5 2.5 0 0 0-2.5-2.5H11v5.5"/><circle cx="7" cy="11" r="1.8"/></symbol>
-    <symbol id="i-bath" viewBox="0 0 24 24"><path d="M3.5 12h17v2.5a4.5 4.5 0 0 1-4.5 4.5H8a4.5 4.5 0 0 1-4.5-4.5Z"/><path d="M6 12V6a2 2 0 0 1 3.7-1"/><path d="M7 19l-1 1.5M17 19l1 1.5"/></symbol>
-    <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 16.5H3.5v-4l2-5a1.5 1.5 0 0 1 1.4-1h10.2a1.5 1.5 0 0 1 1.4 1l2 5v4H19"/><path d="M3.5 12.5h17"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/><path d="M9.3 16.5h5.4"/></symbol>
-    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></symbol>
-    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4.5 16v2.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V16"/></symbol>
-    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M4.5 16v2.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V16"/></symbol>
-    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4v4h-4"/></symbol>
-    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6"/></symbol>
-    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></symbol>
-    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 19.5s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10Z"/></symbol>
-    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4.5h3.5l1.5 4-2 1.5a10 10 0 0 0 6 6l1.5-2 4 1.5V19a1.5 1.5 0 0 1-1.6 1.5A15.5 15.5 0 0 1 3.5 6.1 1.5 1.5 0 0 1 5 4.5Z"/></symbol>
-    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
-    <symbol id="i-note" viewBox="0 0 24 24"><path d="M6.5 3.5h8l4 4v11a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z"/><path d="M14.5 3.5v4h4"/><path d="M8.5 12.5h7M8.5 16h5"/></symbol>
-    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></symbol>
-    <!-- SPRITE:END -->
-  </svg>
+<!-- type: software (a CRM sold to real-estate agencies)
+     deal: hero centred, nav nav-centre (nav-cards dealt; no photograph for its panel cards, dealt again), close close-word,
+           footer footer-columns, rhythm dark-band (app-frame), buttons pill (tonal dealt; the client's references
+           CRMPro and Valtro use pill buttons), mark: the client's logo (dots dealt), grounds: none, effect: none
+     palette: the client's own (logo blue #2667CC on white, start.mjs brand), type geist (self-hosted)
+     moments: marquee-row in #como-funciona (counter-rolls dealt; its section was sparse, the figures moved into sentences) -->
 
-  <!-- Shown only if JavaScript modules could not start (e.g. opened by double-click in Chrome) -->
-  <div id="boot-notice" class="boot-notice">
-    <section class="card boot-notice__card" aria-labelledby="boot-title">
-      <img src="./assets/img/logo.png" alt="" width="48" height="44" class="auth-card__logo">
-      <h1 id="boot-title">No pudimos iniciar Habitat CRM</h1>
-      <p class="text-muted">Abriste el archivo directamente y tu navegador (Chrome, Edge o Brave) bloquea los módulos de JavaScript en ese modo.</p>
-      <p>Para usar la aplicación:</p>
-      <ol>
-        <li>Abre una terminal en la carpeta del proyecto.</li>
-        <li>Ejecuta <code>python3 -m http.server 8000</code></li>
-        <li>Entra a <code>http://localhost:8000</code></li>
-      </ol>
-      <p class="text-sm text-muted">También puedes abrir <code>index.html</code> con Firefox.</p>
-    </section>
-  </div>
-  <noscript>
-    <p class="container">Habitat CRM necesita JavaScript activado para funcionar.</p>
-  </noscript>
-
-  <div id="toast-region" class="toast-region" aria-live="polite" aria-relevant="additions"></div>
-
-  <!-- ===================================================== LOGIN -->
-  <main id="view-login" class="view view-login" hidden>
-    <section class="card auth-card" aria-labelledby="login-title">
-      <header class="auth-card__header">
-        <img src="./assets/img/logo.png" alt="" width="48" height="44" class="auth-card__logo">
-        <div>
-          <h1 id="login-title" class="page__title" tabindex="-1">Habitat CRM</h1>
-          <p class="page__subtitle">Accede a tu cuenta para continuar</p>
-        </div>
-      </header>
-
-      <div class="tabs" role="tablist" aria-label="Acceso">
-        <button type="button" class="tab" role="tab" id="tab-login" aria-controls="panel-login" aria-selected="true">Iniciar sesión</button>
-        <button type="button" class="tab" role="tab" id="tab-register" aria-controls="panel-register" aria-selected="false" tabindex="-1">Crear cuenta</button>
-      </div>
-
-      <div id="panel-login" role="tabpanel" aria-labelledby="tab-login">
-        <form id="login-form" class="auth-form" novalidate>
-          <div id="login-error" class="alert alert--danger" role="alert"></div>
-          <div class="field">
-            <label class="field__label" for="login-username">Usuario</label>
-            <input class="field__control" id="login-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="login-username-error">
-            <span class="field__error" id="login-username-error"></span>
-          </div>
-          <div class="field">
-            <label class="field__label" for="login-password">Contraseña</label>
-            <div class="field__affix field__affix--suffix">
-              <input class="field__control" id="login-password" name="password" type="password" autocomplete="current-password" aria-describedby="login-password-error">
-              <span class="field__suffix">
-                <button type="button" class="btn btn--ghost btn--icon" id="toggle-password" aria-label="Mostrar contraseña" aria-pressed="false" aria-controls="login-password">
-                  <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
-                </button>
-              </span>
-            </div>
-            <span class="field__error" id="login-password-error"></span>
-          </div>
-          <button type="submit" class="btn btn--primary btn--block">Iniciar sesión</button>
-        </form>
-
-        <div class="auth-demo">
-          <p class="auth-demo__label">Cuentas de prueba</p>
-          <div class="auth-demo__buttons">
-            <button type="button" class="btn btn--ghost" data-demo-user="admin">Autocompletar Admin (admin / admin)</button>
-            <button type="button" class="btn btn--ghost" data-demo-user="client">Autocompletar Cliente (client / client)</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="panel-register" role="tabpanel" aria-labelledby="tab-register" hidden>
-        <form id="register-form" class="auth-form" novalidate>
-          <div id="register-error" class="alert alert--danger" role="alert"></div>
-          <div class="field">
-            <label class="field__label" for="register-name">Nombre completo</label>
-            <input class="field__control" id="register-name" name="name" type="text" autocomplete="name" aria-describedby="register-name-error">
-            <span class="field__error" id="register-name-error"></span>
-          </div>
-          <div class="field">
-            <label class="field__label" for="register-username">Usuario</label>
-            <input class="field__control" id="register-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="register-username-help register-username-error">
-            <span class="field__help" id="register-username-help">Letras, números, punto o guion. Lo usarás para entrar.</span>
-            <span class="field__error" id="register-username-error"></span>
-          </div>
-          <div class="field">
-            <label class="field__label" for="register-email">Correo electrónico</label>
-            <input class="field__control" id="register-email" name="email" type="email" autocomplete="email" inputmode="email" aria-describedby="register-email-error">
-            <span class="field__error" id="register-email-error"></span>
-          </div>
-          <div class="field">
-            <label class="field__label" for="register-phone">Teléfono <span class="field__optional">(opcional)</span></label>
-            <input class="field__control" id="register-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="register-phone-error">
-            <span class="field__error" id="register-phone-error"></span>
-          </div>
-          <div class="form-grid form-grid--2">
-            <div class="field">
-              <label class="field__label" for="register-password">Contraseña</label>
-              <input class="field__control" id="register-password" name="password" type="password" autocomplete="new-password" aria-describedby="register-password-error">
-              <span class="field__error" id="register-password-error"></span>
-            </div>
-            <div class="field">
-              <label class="field__label" for="register-confirm">Confirmar contraseña</label>
-              <input class="field__control" id="register-confirm" name="confirmPassword" type="password" autocomplete="new-password" aria-describedby="register-confirm-error">
-              <span class="field__error" id="register-confirm-error"></span>
-            </div>
-          </div>
-          <button type="submit" class="btn btn--primary btn--block">Crear cuenta</button>
-        </form>
-      </div>
-    </section>
-  </main>
-
-  <!-- ===================================================== CLIENT -->
-  <div id="view-client" class="view has-bottom-nav has-bottom-nav--client" hidden>
-    <header class="app-header">
-      <div class="container app-header__inner">
-        <a class="brand" href="#/catalogo" aria-label="Habitat CRM, ir al catálogo">
-          <img src="./assets/img/logo.png" alt="" width="28" height="26" class="brand__logo">
-          <span>Habitat CRM</span>
-        </a>
-        <nav class="nav-links" aria-label="Principal">
-          <a class="nav-link" href="#/catalogo" data-route="catalogo">
-            <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Catálogo
-          </a>
-          <a class="nav-link" href="#/consultas" data-route="consultas">
-            <svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg>Mis consultas
-          </a>
-        </nav>
-        <span class="app-header__spacer"></span>
-        <div class="user-chip">
-          <span class="avatar" data-bind="user-avatar" aria-hidden="true"></span>
-          <span class="user-chip__text">
-            <span class="user-chip__name" data-bind="user-name"></span>
-            <span class="user-chip__role" data-bind="user-role"></span>
-          </span>
-        </div>
-        <button type="button" class="btn btn--secondary btn--icon logout-btn" data-action="logout" aria-label="Cerrar sesión">
-          <svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>
-          <span class="logout-btn__label">Cerrar sesión</span>
-        </button>
-      </div>
-    </header>
-
-    <main class="container">
-      <section class="page" data-section="catalogo" aria-labelledby="client-catalog-title">
-        <header class="page__header">
-          <div>
-            <h1 id="client-catalog-title" class="page__title" tabindex="-1">Encuentra tu próximo hogar</h1>
-            <p class="page__subtitle">Casas, apartamentos y locales en venta y arriendo</p>
-          </div>
-        </header>
-        <div id="client-catalog-root"></div>
-      </section>
-      <section class="page" data-section="consultas" aria-labelledby="client-inquiries-title" hidden>
-        <header class="page__header">
-          <div>
-            <h1 id="client-inquiries-title" class="page__title" tabindex="-1">Mis consultas</h1>
-            <p class="page__subtitle">Inmuebles por los que preguntaste y su estado</p>
-          </div>
-        </header>
-        <div id="client-inquiries-root"></div>
-      </section>
-    </main>
-
-    <nav class="bottom-nav bottom-nav--client" aria-label="Principal (móvil)">
-      <a class="bottom-nav__link" href="#/catalogo" data-route="catalogo">
-        <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Catálogo
-      </a>
-      <a class="bottom-nav__link" href="#/consultas" data-route="consultas">
-        <svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg>Mis consultas
-      </a>
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Saltar al contenido</a>
+    <a class="nav__logo" href="#top" aria-label="Habitat CRM, inicio"><img class="brand-logo" src="assets/img/logo.png" alt="" width="28" height="26"><span class="brand-name">Habitat CRM</span></a>
+    <nav class="nav__links" aria-label="Principal">
+      <div class="nav__item"><a class="nav__link" href="#producto">Producto</a></div>
+      <div class="nav__item"><a class="nav__link" href="#funciones">Funciones</a></div>
+      <div class="nav__item"><a class="nav__link" href="#como-funciona">Cómo funciona</a></div>
+      <div class="nav__item"><a class="nav__link" href="#faq">Preguntas</a></div>
     </nav>
+    <div class="nav__actions">
+      <a class="btn btn--primary" href="app.html">Ingresar al CRM</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menú">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
   </div>
+</header>
 
-  <!-- ===================================================== ADVISOR / ADMIN -->
-  <div id="view-admin" class="view admin-layout" hidden>
-    <aside class="sidebar" aria-label="Menú del asesor">
-      <a class="brand" href="#/resumen">
-        <img src="./assets/img/logo.png" alt="" width="28" height="26" class="brand__logo">
-        <span>Habitat CRM</span>
-      </a>
-      <nav class="sidebar__nav" aria-label="Principal">
-        <a class="nav-link" href="#/resumen" data-route="resumen"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Resumen</a>
-        <a class="nav-link" href="#/propiedades" data-route="propiedades"><svg class="icon" aria-hidden="true"><use href="#i-building"></use></svg>Propiedades</a>
-        <a class="nav-link" href="#/leads" data-route="leads"><svg class="icon" aria-hidden="true"><use href="#i-funnel"></use></svg>Leads</a>
-        <a class="nav-link" href="#/datos" data-route="datos"><svg class="icon" aria-hidden="true"><use href="#i-database"></use></svg>Datos</a>
-      </nav>
-      <div class="sidebar__footer">
-        <div class="user-chip">
-          <span class="avatar" data-bind="user-avatar" aria-hidden="true"></span>
-          <span class="user-chip__text">
-            <span class="user-chip__name" data-bind="user-name"></span>
-            <span class="user-chip__role" data-bind="user-role"></span>
-          </span>
-        </div>
-        <button type="button" class="btn btn--ghost logout-btn" data-action="logout">
-          <svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>
-          <span class="logout-btn__label">Cerrar sesión</span>
-        </button>
+<main id="top">
+  <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__c">
+        <a class="pill" href="#faq"><span>Desde el computador o el celular</span><span class="muted">Sin instalar nada</span></a>
+        <h1 id="hero-h">El CRM para inmobiliarias</h1>
+        <p class="hero__lead">Tus propiedades, los clientes interesados en ellas y cada negocio, desde el primer contacto hasta el cierre. Todo el equipo de asesores trabaja en el mismo lugar.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="app.html">Ingresar al CRM</a><a class="btn btn--secondary" href="#como-funciona">Ver cómo funciona</a></div>
       </div>
-    </aside>
-
-    <div class="has-bottom-nav">
-      <header class="app-header app-header--mobile">
-        <div class="container app-header__inner">
-          <a class="brand" href="#/resumen">
-            <img src="./assets/img/logo.png" alt="" width="28" height="26" class="brand__logo">
-            <span>Habitat CRM</span>
-          </a>
-          <span class="app-header__spacer"></span>
-          <div class="user-chip">
-            <span class="avatar" data-bind="user-avatar" aria-hidden="true"></span>
-            <span class="user-chip__text">
-              <span class="user-chip__name" data-bind="user-name"></span>
-              <span class="user-chip__role" data-bind="user-role"></span>
-            </span>
+      <div class="hero__window" role="img" aria-label="Habitat CRM: la lista de clientes y la ficha de Paula Ruiz pasando a la etapa Visita">
+        <div class="ly-piece ui hw" aria-hidden="true">
+          <div class="hw__bar"><span class="hw__dots"><i></i><i></i><i></i></span><span><b>Habitat CRM</b> · Clientes</span><span class="hw__sp"></span><span>Laura Mendoza</span></div>
+          <div class="hw__body">
+            <div class="hw__list">
+              <div class="hw__search">Buscar cliente</div>
+              <div class="hw__row is-on"><i>PR</i><b>Paula Ruiz</b><time>10:42</time><span>Local en el Centro Histórico</span></div>
+              <div class="hw__row"><i>SH</i><b>Sofía Herrera</b><time>9:15</time><span>Apartamento para Estrenar</span></div>
+              <div class="hw__row"><i>JC</i><b>Jorge Castaño</b><time>ayer</time><span>Local Comercial sobre Avenida</span></div>
+            </div>
+            <div class="hw__open">
+              <div class="hw__head"><b>Paula Ruiz</b><span>WhatsApp · +57 300 123 4567</span></div>
+              <div class="hw__prop"><span class="hw__thumb"></span><span><b>Local en el Centro Histórico</b><small>Centro Histórico, Cartagena · $ 380.000.000</small></span></div>
+              <ol class="hw__stages"><li class="is-done">Nuevo</li><li class="is-done">Contactado</li><li class="is-now">Visita</li><li>Negociación</li><li>Cerrado</li></ol>
+              <div class="hw__feed" data-ly-steps="900">
+                <p class="hw__note">Visita agendada para el sábado a las 10:00.</p>
+                <p class="hw__done" data-step>Etapa cambiada a <b>Visita</b> · Laura Mendoza</p>
+              </div>
+            </div>
           </div>
-          <button type="button" class="btn btn--secondary btn--icon logout-btn" data-action="logout" aria-label="Cerrar sesión">
-            <svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>
-            <span class="logout-btn__label">Cerrar sesión</span>
-          </button>
         </div>
-      </header>
+      </div>
+    </div></div>
+  </section>
 
-      <main class="container">
-        <section class="page" data-section="resumen" aria-labelledby="admin-summary-title">
-          <header class="page__header">
-            <div>
-              <h1 id="admin-summary-title" class="page__title" tabindex="-1">Resumen</h1>
-              <p class="page__subtitle">Indicadores calculados con los datos actuales</p>
+  <section class="section ground-inverse" id="producto" aria-labelledby="producto-h">
+    <div class="wrap">
+      <div class="grid">
+        <h2 id="producto-h" class="span-5">Cada propiedad con sus clientes interesados</h2>
+        <p class="span-6 start-7 t-lead">El inventario a la izquierda; a la derecha, la propiedad abierta con su precio, su estado y cada cliente interesado en ella, con la etapa en la que va su negocio. <a class="link" href="app.html">Ingresar al CRM</a></p>
+      </div>
+      <div class="ui app fill" role="img" aria-label="Habitat CRM: inventario de nueve propiedades y la Casa Campestre abierta con sus clientes interesados" data-ui-pause-host>
+        <div class="app__pane app__pane--list">
+          <div class="af-list">
+            <div class="af-list__head"><b>Propiedades</b><span>9</span></div>
+            <div class="af-row"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Local en el Centro Histórico</b><small>Cartagena · $ 380.000.000</small></span><em class="st st--ok">Disponible</em></div>
+            <div class="af-row"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Apartamento para Estrenar</b><small>Envigado · $ 1.900.000 / mes</small></span><em class="st st--ok">Disponible</em></div>
+            <div class="af-row is-on"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Casa Campestre con Jardín</b><small>Rionegro · $ 890.000.000</small></span><em class="st st--ok">Disponible</em></div>
+            <div class="af-row"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Penthouse Dúplex</b><small>Bogotá · $ 1.350.000.000</small></span><em class="st st--sold">Vendida</em></div>
+            <div class="af-row"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Oficina Ejecutiva</b><small>Bogotá · $ 4.800.000 / mes</small></span><em class="st st--ok">Disponible</em></div>
+            <div class="af-row"><img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Casa Familiar en Conjunto</b><small>Cali · $ 620.000.000</small></span><em class="st st--neg">En negociación</em></div>
+            <div class="af-row"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Local Comercial sobre Avenida</b><small>Medellín · $ 6.500.000 / mes</small></span><em class="st st--neg">En negociación</em></div>
+            <div class="af-row"><img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Apartaestudio Amoblado</b><small>Bogotá · $ 2.300.000 / mes</small></span><em class="st st--ok">Disponible</em></div>
+            <div class="af-row"><img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Apartamento con Vista al Mar</b><small>Cartagena · $ 450.000.000</small></span><em class="st st--ok">Disponible</em></div>
+          </div>
+        </div>
+        <div class="app__pane app__pane--open">
+          <div class="af-open">
+            <div class="af-open__top">
+              <div><p class="af-kicker">Venta · Casa · Llanogrande, Rionegro</p><p class="af-title">Casa Campestre con Jardín y Chimenea</p></div>
+              <p class="af-price">$ 890.000.000</p>
             </div>
-          </header>
-          <div id="admin-summary-root"></div>
-        </section>
-        <section class="page" data-section="propiedades" aria-labelledby="admin-properties-title" hidden>
-          <header class="page__header">
-            <div>
-              <h1 id="admin-properties-title" class="page__title" tabindex="-1">Propiedades</h1>
-              <p class="page__subtitle">Inventario publicado en el catálogo</p>
+            <p class="af-facts"><span>280 m²</span><span>4 habitaciones</span><span>4 baños</span><span>2 parqueaderos</span><span>Asesor: Andrés Rojas</span></p>
+            <p class="af-sub">Clientes interesados</p>
+            <div class="af-leads" data-ly-steps="1100">
+              <div class="af-lead"><i>FA</i><span><b>Felipe Arango</b><small>Referido · ofertó $ 850 millones</small></span><em class="st st--neg">Negociación</em></div>
+              <div class="af-lead"><i>LV</i><span><b>Lucía Vargas</b><small>Portal web · pidió el certificado de tradición</small></span><em class="st st--info">Contactado</em></div>
+              <div class="af-lead"><i>MT</i><span><b>Mateo Torres</b><small>Llamada · visita el jueves a las 4:00 p. m.</small></span><em class="st st--neg">Visita</em></div>
+              <div class="af-lead" data-step><i>CS</i><span><b>Camila Suárez</b><small>WhatsApp · registrado hace un momento</small></span><em class="st st--info">Nuevo</em></div>
             </div>
-          </header>
-          <div id="admin-properties-root"></div>
-        </section>
-        <section class="page" data-section="leads" aria-labelledby="admin-leads-title" hidden>
-          <header class="page__header">
-            <div>
-              <h1 id="admin-leads-title" class="page__title" tabindex="-1">Leads</h1>
-              <p class="page__subtitle">Embudo comercial por etapa</p>
-            </div>
-          </header>
-          <div id="admin-leads-root"></div>
-        </section>
-        <section class="page" data-section="datos" aria-labelledby="admin-data-title" hidden>
-          <header class="page__header">
-            <div>
-              <h1 id="admin-data-title" class="page__title" tabindex="-1">Datos</h1>
-              <p class="page__subtitle">Respaldo, importación y restauración de la información</p>
-            </div>
-          </header>
-          <div id="admin-data-root"></div>
-        </section>
-      </main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <nav class="bottom-nav" aria-label="Principal (móvil)">
-        <a class="bottom-nav__link" href="#/resumen" data-route="resumen"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Resumen</a>
-        <a class="bottom-nav__link" href="#/propiedades" data-route="propiedades"><svg class="icon" aria-hidden="true"><use href="#i-building"></use></svg>Propiedades</a>
-        <a class="bottom-nav__link" href="#/leads" data-route="leads"><svg class="icon" aria-hidden="true"><use href="#i-funnel"></use></svg>Leads</a>
-        <a class="bottom-nav__link" href="#/datos" data-route="datos"><svg class="icon" aria-hidden="true"><use href="#i-database"></use></svg>Datos</a>
-      </nav>
+  <section class="section g2" id="funciones" aria-labelledby="funciones-h">
+    <div class="wrap">
+      <div class="group">
+        <div class="section-head">
+          <h2 id="funciones-h">Funciones de Habitat CRM. <span class="muted">Lo justo para que ningún interesado se quede sin respuesta.</span></h2>
+        </div>
+        <div class="grid">
+          <article class="card card--row card--open span-6">
+            <h3>El negocio de un vistazo</h3>
+            <p>Propiedades disponibles, clientes en seguimiento y negocios cerrados, con las cifras de hoy.</p>
+            <div class="panel"><div class="ui bx">
+              <div class="bx-dash">
+                <div class="bx-kpi"><small>Disponibles</small><b>6</b></div>
+                <div class="bx-kpi"><small>En seguimiento</small><b>6</b></div>
+                <div class="bx-kpi"><small>Tasa de cierre</small><b>50 %</b></div>
+                <div class="bx-chart"><small>Clientes por etapa</small>
+                  <svg viewBox="0 0 300 96" aria-hidden="true"><rect class="c-soft" x="8" y="20" width="40" height="64" rx="8"/><rect class="c-soft" x="68" y="20" width="40" height="64" rx="8"/><rect class="c-soft" x="128" y="52" width="40" height="32" rx="8"/><rect class="c-soft" x="188" y="52" width="40" height="32" rx="8"/><rect class="c-main" x="248" y="20" width="40" height="64" rx="8"/></svg>
+                </div>
+              </div>
+            </div></div>
+          </article>
+          <article class="card card--row card--open span-6">
+            <h3>Encuentra cualquier propiedad</h3>
+            <p>Escribe el nombre o la ciudad, con o sin tildes: «bogota» encuentra los inmuebles de Bogotá.</p>
+            <div class="panel"><div class="ui bx">
+              <div class="bx-search"><span class="bx-field">bogota</span><span class="bx-hit">Apartaestudio Amoblado · Chapinero Alto, Bogotá</span><span class="bx-hit">Oficina Ejecutiva · Santa Bárbara, Bogotá</span><span class="bx-hit">Penthouse Dúplex · Rosales, Bogotá</span></div>
+            </div></div>
+          </article>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card card--row card--open span-6">
+          <h3>Fichas completas y sin errores</h3>
+          <p>Si falta el título o el área quedó en cero, el CRM te avisa antes de guardar la propiedad.</p>
+          <div class="panel"><div class="ui bx">
+            <div class="bx-form"><span class="bx-label">Área (m²)</span><span class="bx-field is-bad">0</span><span class="bx-err">El área debe ser mayor que 0</span></div>
+          </div></div>
+        </article>
+        <article class="card card--row card--open span-6">
+          <h3>Todo el equipo al día</h3>
+          <p>Cuando un asesor avanza un cliente de etapa, sus compañeros lo ven al momento.</p>
+          <div class="panel"><div class="ui bx">
+            <div class="bx-tabs"><span><small>Laura Mendoza</small>Movió a Ana Gómez a Visita</span><span><small>Andrés Rojas lo ve al instante</small>Ana Gómez · Visita</span></div>
+          </div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="como-funciona" aria-labelledby="pasos-h">
+    <div class="wrap">
+      <div class="section-head"><h2 id="pasos-h">El proceso de venta en 3 pasos</h2></div>
+      <div class="grid">
+        <article class="card card--row card--open span-4">
+          <span class="step-num">1</span>
+          <h3>Registra al cliente</h3>
+          <p>Nombre, teléfono o correo, cómo llegó y la propiedad que le interesa.</p>
+          <div class="panel"><div class="ui bx"><div class="bx-form"><span class="bx-label">Nombre del cliente</span><span class="bx-field">Camila Suárez</span><span class="bx-label">Cómo llegó</span><span class="bx-field">WhatsApp</span></div></div></div>
+        </article>
+        <article class="card card--row card--open span-4">
+          <span class="step-num">2</span>
+          <h3>Acompáñalo en cada etapa</h3>
+          <p>Llamada, visita, negociación: cambias su etapa desde su tarjeta.</p>
+          <div class="panel"><div class="ui bx"><div class="bx-stage"><span class="st st--info">Contactado</span><span class="bx-arrow">→</span><span class="st st--neg">Visita</span></div></div></div>
+        </article>
+        <article class="card card--row card--open span-4">
+          <span class="step-num">3</span>
+          <h3>Cierra el negocio</h3>
+          <p>Márcalo como cerrado y el resumen lo suma a tu tasa de cierre.</p>
+          <div class="panel"><div class="ui bx"><div class="bx-stage"><span class="st st--neg">Negociación</span><span class="bx-arrow">→</span><span class="st st--ok">Negocio cerrado</span></div></div></div>
+        </article>
+      </div>
+      <div class="mq">
+        <p class="t-label">Para todo tu inventario y cada canal</p>
+        <div data-moment="marquee-row" data-moment-opts='{"speed": 36}'>
+          <ul class="mo-mq__track"><li>Apartamentos</li><li>Casas</li><li>Locales</li><li>Oficinas</li><li>Lotes</li><li>Venta</li><li>Arriendo</li><li>Portal web</li><li>Llamadas</li><li>WhatsApp</li><li>Visitas a la oficina</li><li>Referidos</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="grid">
+        <h2 id="faq-h" class="span-5">Preguntas sobre Habitat CRM</h2>
+        <div class="faq span-6 start-7">
+          <div class="faq__item"><h3>¿Hay que instalar el CRM?</h3><p>No. Cada asesor entra desde el computador o el celular con su usuario y contraseña.</p></div>
+          <div class="faq__item"><h3>¿Quién entra al CRM?</h3><p>Todo el equipo de asesores de la inmobiliaria. Todos ven el mismo inventario y los mismos clientes.</p></div>
+          <div class="faq__item"><h3>¿Puedo ver los clientes de otro asesor?</h3><p>Sí. Cada cliente tiene un asesor responsable, y cualquiera del equipo puede ver en qué etapa va su negocio.</p></div>
+          <div class="faq__item"><h3>¿Y si un cliente deja de estar interesado?</h3><p>Pásalo a «Descartado». Sale del seguimiento, pero su ficha y sus notas quedan guardadas.</p></div>
+          <div class="faq__item"><h3>¿El CRM funciona en el celular?</h3><p>Sí. El menú pasa a una barra inferior y las tablas se vuelven tarjetas.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--word">
+      <div class="section-head--split">
+        <div><h2 id="close-h">Conoce Habitat CRM por dentro</h2><p class="t-lead">Entra con la cuenta de prueba (usuario admin, contraseña admin). La pantalla de acceso llena los datos por ti.</p></div>
+        <a class="btn btn--primary" href="app.html">Ingresar al CRM<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+      </div>
+      <p class="close__word" aria-hidden="true">Habitat</p>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-6 stack-4">
+          <a class="nav__logo" href="#top"><img class="brand-logo" src="assets/img/logo.png" alt="" width="28" height="26">Habitat CRM</a>
+          <p class="footer__lede">CRM para inmobiliarias: propiedades, clientes y negocios en un solo lugar.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Producto</h3><ul><li><a href="#producto">Propiedades y clientes</a></li><li><a href="#funciones">Funciones</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Uso</h3><ul><li><a href="#como-funciona">Cómo funciona</a></li><li><a href="#faq">Preguntas</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Acceso</h3><ul><li><a href="app.html">Iniciar sesión</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Habitat CRM</span>
+        <span class="credits">Fotografías: Unsplash</span>
+      </div>
     </div>
   </div>
+</footer>
+
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
 </body>
 </html>

@@ -1,0 +1,153 @@
+/* ==========================================================================
+   Habitat CRM — landing page CSS (index.html)
+   The page runs on the taste-skill kit (assets/system.css and friends). This file
+   holds only what the kit lacks: the self-hosted font and the inside of each
+   visual (the CRM drawn as live HTML). Colours come from the kit's tokens
+   (--p-*, --u-*), so the dark band recolours the app frame by itself.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Geist";
+  src: url("../assets/fonts/geist.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.brand-logo { width: 28px; height: 26px; object-fit: contain; }
+/* at 320 the bar holds the logo, the main button and the menu: the name steps aside, the logo keeps its label */
+@media (max-width: 359px) { .nav .brand-name { display: none; } }
+/* Geist's ascenders are taller than the kit's .86 line: give the closing word room at its top */
+.close__word { line-height: 1.02; }
+
+/* Status chips shared by every visual (the CRM's own states) */
+.st {
+  display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+  padding: 2px 10px; border-radius: 999px;
+  font-style: normal; font-size: 12px; font-weight: 500; white-space: nowrap;
+}
+.st::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.st--ok { color: #0e7a4b; background: #e6f6ee; }
+.st--neg { color: #9a5b00; background: #fff4dc; }
+.st--sold { color: #b42318; background: #fdeceb; }
+.st--info { color: #1d5fd0; background: #e8f0fe; }
+
+/* ---------------------------------------------------------------- hero window: the leads view */
+.hero--centred .hero__window { background: linear-gradient(180deg, #e9f0fb, #f5f6fa 70%); }
+.hw {
+  overflow: hidden; border-radius: 16px; background: #fff; color: var(--p-ink);
+  box-shadow: 0 24px 60px rgba(27, 31, 39, .12), 0 0 0 1px rgba(27, 31, 39, .06);
+  font-size: 13px; line-height: 1.4;
+}
+.hw__bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #eceef3; color: var(--p-muted); }
+.hw__bar b { color: var(--p-ink); font-weight: 600; }
+.hw__dots { display: inline-flex; gap: 6px; }
+.hw__dots i { width: 10px; height: 10px; border-radius: 50%; background: #dfe3ea; }
+.hw__sp { flex: 1; }
+.hw__body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+.hw__list { border-right: 1px solid #eceef3; padding: 12px; display: grid; align-content: start; gap: 4px; }
+.hw__search { padding: 8px 12px; border-radius: 999px; background: #f3f5f9; color: var(--p-muted); margin-bottom: 6px; }
+.hw__row { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; column-gap: 10px; padding: 8px 10px; border-radius: 12px; }
+.hw__row i, .af-lead i, .bx-people i {
+  grid-row: span 2; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  font-style: normal; font-size: 11px; font-weight: 600; color: #1f56ad; background: #eaf1fc;
+}
+.hw__row b { font-weight: 600; }
+.hw__row time { color: var(--p-muted); font-size: 12px; }
+.hw__row span { grid-column: 2 / 4; color: var(--p-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hw__row.is-on { background: #eaf1fc; }
+.hw__open { padding: 16px 20px; display: grid; align-content: start; gap: 14px; }
+.hw__head { display: grid; gap: 2px; }
+.hw__head b { font-size: 16px; font-weight: 600; }
+.hw__head span { color: var(--p-muted); }
+.hw__prop { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 12px; background: #f5f6fa; }
+.hw__prop small { display: block; color: var(--p-muted); }
+.hw__thumb { width: 56px; height: 42px; flex-shrink: 0; border-radius: 8px; background: url("../assets/img/login-house.jpg") center / cover; }
+.hw__stages { display: flex; gap: 6px; padding: 0; margin: 0; list-style: none; }
+.hw__stages li { flex: 1; padding: 6px 4px; border-radius: 999px; text-align: center; font-size: 11px; font-weight: 500; color: var(--p-muted); background: #f3f5f9; white-space: nowrap; }
+.hw__stages .is-done { color: #1f56ad; background: #eaf1fc; }
+.hw__stages .is-now { color: #fff; background: var(--p-accent); }
+.hw__feed { display: grid; gap: 8px; }
+.hw__note { padding: 10px 12px; border-radius: 12px; background: #f5f6fa; }
+.hw__done { padding: 10px 12px; border-radius: 12px; color: #0e7a4b; background: #e6f6ee; }
+@media (max-width: 639px) {
+  .hw__bar > span:last-child { display: none; }
+  .hw__body { grid-template-columns: minmax(0, 1fr); }
+  .hw__list { display: none; }
+  .hw__stages li:nth-child(n + 4) { display: none; }
+}
+
+/* ---------------------------------------------------------------- app-frame (sections-library.md, app-frame) */
+.app.ui { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); margin-top: var(--s-7); background: var(--u-bg); border: 1px solid var(--u-border); border-radius: var(--u-r); box-shadow: var(--u-shadow); }
+.app > .app__pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.app > .app__pane + .app__pane { border-left: 1px solid var(--u-line); }
+.app > .app__pane::after { content: ""; position: absolute; inset: auto 0 0 0; height: 64px; background: linear-gradient(transparent, var(--u-bg)); pointer-events: none; }
+@media (min-width: 1024px) and (max-width: 1279px) { .app.ui { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); } }
+@media (max-width: 1023px) {
+  .app.ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .app > .app__pane--list { max-height: 252px; }
+  .app > .app__pane--list::after { display: none; }
+  .app > .app__pane + .app__pane { border-left: 0; border-top: 1px solid var(--u-line); }
+}
+@media (max-width: 639px) {
+  .app.ui { grid-template-rows: minmax(0, 1fr); }
+  .app > .app__pane--list { display: none; }
+  .app > .app__pane + .app__pane { border-top: 0; }
+}
+
+.af-list, .af-open { color: var(--u-ink); font-size: 13px; line-height: 1.4; }
+.af-list { padding: 16px; display: grid; gap: 4px; }
+.af-list__head { display: flex; justify-content: space-between; padding: 4px 8px 10px; color: var(--u-muted); }
+.af-list__head b { color: var(--u-ink); font-weight: 600; }
+.af-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px; border-radius: 12px; }
+.af-row img { width: 64px; height: 48px; border-radius: 8px; object-fit: cover; background: var(--u-fill); }
+.af-row b, .af-lead b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.af-row small, .af-lead small { display: block; color: var(--u-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.af-row.is-on { background: var(--u-fill); }
+.af-open { padding: 24px 28px; display: grid; gap: 16px; }
+.af-open__top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.af-kicker { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--u-muted); }
+.af-title { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+.af-price { font-size: 24px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.af-facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.af-facts span { padding: 4px 10px; border-radius: 999px; background: var(--u-fill); color: var(--u-muted); }
+.af-sub { margin-top: 8px; font-weight: 600; }
+.af-leads { display: grid; gap: 8px; }
+.af-lead { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; padding: 12px; border-radius: 12px; border: 1px solid var(--u-line); }
+.af-lead i { grid-row: auto; }
+
+/* ---------------------------------------------------------------- bento and step panels: small pieces of the CRM */
+#funciones .panel { --p-h: 260px; }
+#como-funciona .panel { --p-h: 196px; }
+@media (max-width: 639px) { #funciones .panel { --p-h: 150px; } #como-funciona .panel { --p-h: 222px; } }
+
+.bx { display: grid; align-content: start; padding: 24px; font-size: 13px; line-height: 1.4; color: var(--p-ink); }
+.bx-dash { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.bx-stage .st { padding: 6px 14px; }
+.bx-kpi, .bx-chart { padding: 14px 16px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1px #e7eaf0; }
+.bx-kpi small, .bx-chart small { display: block; color: var(--p-muted); }
+.bx-kpi b { display: block; margin-top: 6px; font-size: 24px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.bx-chart { grid-column: 1 / -1; }
+.bx-chart svg { display: block; width: 100%; max-width: 320px; height: auto; margin-top: 8px; }
+.c-soft { fill: #c9daf6; }
+.c-main { fill: var(--p-accent); }
+.bx-people { display: grid; gap: 8px; }
+.bx-people span { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; column-gap: 10px; padding: 8px 12px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px #e7eaf0; font-weight: 500; }
+.bx-people i { grid-row: auto; }
+.bx-people em { font-style: normal; color: var(--p-muted); font-weight: 400; }
+.bx-search, .bx-form { display: grid; gap: 8px; }
+.bx-field { padding: 10px 14px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px #cfd5de; }
+.bx-field.is-bad { box-shadow: 0 0 0 1px #b42318; }
+.bx-label { font-weight: 500; }
+.bx-err { justify-self: start; padding: 4px 10px; border-radius: 8px; color: #b42318; background: #fff; }
+.bx-hit { padding: 8px 12px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px #e7eaf0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bx-tabs { display: grid; gap: 10px; }
+.bx-tabs span { padding: 12px 14px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px #e7eaf0; }
+.bx-tabs small { display: block; color: var(--p-muted); }
+.bx-stage { display: flex; align-items: center; gap: 12px; padding-top: 24px; }
+.bx-arrow { color: var(--p-ink); }
+
+/* the marquee closes the steps section as its last row (moments.md); minmax keeps its rail from widening the page */
+.mq { margin-top: var(--s-8); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); overflow: hidden; }
+/* on a phone the three steps and the marquee need exactly two screens */
+@media (max-width: 639px) { #como-funciona { --hm: 2; } }

@@ -10,18 +10,15 @@ import { initSync, subscribe } from './services/syncService.js';
 import { getActiveSession, revalidateSession, isStaff } from './services/authService.js';
 import { showToast, closeAllModals } from './ui/toastUI.js';
 import { initAuthUI, renderUserChips, resetLoginScreen } from './ui/authUI.js';
-import { mountClientUI, refreshClientUI, unmountClientUI, renderClientLoading } from './ui/clientUI.js';
 import { mountAdminUI, refreshAdminUI, unmountAdminUI, renderAdminLoading } from './ui/adminUI.js';
 
-const VIEWS = ['login', 'client', 'admin'];
+const VIEWS = ['login', 'admin'];
 
 const ROUTES = {
-  client: { catalogo: 'Catálogo', consultas: 'Mis consultas' },
-  admin: { resumen: 'Resumen', propiedades: 'Propiedades', leads: 'Leads', datos: 'Datos' },
+  admin: { resumen: 'Resumen', propiedades: 'Propiedades', clientes: 'Clientes' },
 };
 
 const CONTROLLERS = {
-  client: { mount: mountClientUI, refresh: refreshClientUI, unmount: unmountClientUI, loading: renderClientLoading },
   admin: { mount: mountAdminUI, refresh: refreshAdminUI, unmount: unmountAdminUI, loading: renderAdminLoading },
 };
 
@@ -32,8 +29,7 @@ let mounted = null; // { view, userId }
 /* ---------- Views ---------- */
 
 function viewForUser(user) {
-  if (!user) return 'login';
-  return isStaff(user) ? 'admin' : 'client';
+  return user && isStaff(user) ? 'admin' : 'login';
 }
 
 function showView(name) {
@@ -76,7 +72,7 @@ function applySection(view, { moveFocus = false } = {}) {
 }
 
 function handleHashChange() {
-  if (currentView === 'client' || currentView === 'admin') applySection(currentView, { moveFocus: true });
+  if (currentView === 'admin') applySection(currentView, { moveFocus: true });
 }
 
 /* ---------- Session guard ---------- */
@@ -89,7 +85,7 @@ async function route({ moveFocus = false } = {}) {
     return;
   }
   const expectedView = viewForUser(session);
-  if (!mounted) {
+  if (!mounted && expectedView !== 'login') {
     showView(expectedView);
     CONTROLLERS[expectedView].loading();
   }
@@ -103,13 +99,13 @@ async function route({ moveFocus = false } = {}) {
   const view = viewForUser(user);
   renderUserChips(user);
   showView(view);
+  if (view === 'login') return;
   mountView(view, user);
   applySection(view, { moveFocus });
 }
 
-function handleLogin(user, { isNew = false } = {}) {
-  const firstName = user.name.split(' ')[0];
-  showToast(isNew ? `Cuenta creada. Te damos la bienvenida, ${firstName}` : `Hola, ${firstName}`, { type: 'success' });
+function handleLogin(user) {
+  showToast(`Hola, ${user.name.split(' ')[0]}`, { type: 'success' });
   history.replaceState(null, '', `#/${Object.keys(ROUTES[viewForUser(user)])[0]}`);
   route({ moveFocus: true });
 }

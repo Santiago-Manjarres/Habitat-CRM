@@ -1,16 +1,16 @@
 /**
- * Login screen: login / register tabs, show-hide password, demo autofill buttons,
- * logout buttons and the user chip. Also exports the shared form helpers
- * (field errors, live validation, loading buttons) reused by the other views.
+ * Login screen: show-hide password, demo autofill buttons, logout buttons and the
+ * user chip. Also exports the shared form helpers (field errors, live validation,
+ * loading buttons) reused by the advisor panel.
  */
 import { ROLE_LABELS } from '../config.js';
 import { escapeHTML, iconMarkup } from '../utils/formatters.js';
-import { validateLoginForm, validateRegistrationForm } from '../utils/validators.js';
-import { login, registerClient, logout } from '../services/authService.js';
+import { validateLoginForm } from '../utils/validators.js';
+import { login, logout } from '../services/authService.js';
 
 const DEMO_CREDENTIALS = {
   admin: { username: 'admin', password: 'admin' },
-  client: { username: 'client', password: 'client' },
+  andres: { username: 'andres', password: '1234' },
 };
 
 let callbacks = { onLogin: () => {}, onLogout: () => {}, whenReady: Promise.resolve() };
@@ -66,39 +66,6 @@ function setFormAlert(id, message) {
 
 function readForm(form) {
   return Object.fromEntries(new FormData(form).entries());
-}
-
-/* ==========================================================================
-   Tabs (roving tabindex, arrow keys, no animation)
-   ========================================================================== */
-
-function selectTab(tab, { focus = false } = {}) {
-  const tabs = [...tab.closest('[role="tablist"]').querySelectorAll('[role="tab"]')];
-  tabs.forEach((item) => {
-    const selected = item === tab;
-    item.setAttribute('aria-selected', String(selected));
-    item.tabIndex = selected ? 0 : -1;
-    document.getElementById(item.getAttribute('aria-controls')).hidden = !selected;
-  });
-  if (focus) tab.focus();
-}
-
-function handleTabKeydown(event) {
-  const tabs = [...event.currentTarget.querySelectorAll('[role="tab"]')];
-  const index = tabs.indexOf(document.activeElement);
-  const moves = { ArrowRight: 1, ArrowLeft: -1, Home: -index, End: tabs.length - 1 - index };
-  if (index === -1 || !(event.key in moves)) return;
-  event.preventDefault();
-  selectTab(tabs[(index + moves[event.key] + tabs.length) % tabs.length], { focus: true });
-}
-
-function bindTabs() {
-  const tablist = document.querySelector('.auth-card [role="tablist"]');
-  tablist.addEventListener('click', (event) => {
-    const tab = event.target.closest('[role="tab"]');
-    if (tab) selectTab(tab);
-  });
-  tablist.addEventListener('keydown', handleTabKeydown);
 }
 
 /* ==========================================================================
@@ -161,41 +128,15 @@ async function handleLoginSubmit(event) {
 }
 
 /* ==========================================================================
-   Register form
-   ========================================================================== */
-
-async function handleRegisterSubmit(event) {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const submit = form.querySelector('[type="submit"]');
-  setFormAlert('register-error', '');
-  setButtonLoading(submit, true);
-  await callbacks.whenReady;
-  const result = registerClient(readForm(form));
-  setButtonLoading(submit, false);
-  if (!result.ok) {
-    showFieldErrors(form, result.fieldErrors)?.focus();
-    enableLiveValidation(form, () => validateRegistrationForm(readForm(form)).errors);
-    return;
-  }
-  form.reset();
-  clearFieldErrors(form);
-  selectTab(document.getElementById('tab-login'));
-  callbacks.onLogin(result.user, { isNew: true });
-}
-
-/* ==========================================================================
    Public API
    ========================================================================== */
 
 /** Binds every login-screen and logout control once. */
 export function initAuthUI({ onLogin, onLogout, whenReady }) {
   callbacks = { onLogin, onLogout, whenReady: whenReady ?? Promise.resolve() };
-  bindTabs();
   bindPasswordToggle();
   bindDemoButtons();
   document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
-  document.getElementById('register-form').addEventListener('submit', handleRegisterSubmit);
   document.addEventListener('click', (event) => {
     if (!event.target.closest('[data-action="logout"]')) return;
     logout();
@@ -217,6 +158,5 @@ export function resetLoginScreen() {
   clearFieldErrors(form);
   setFormAlert('login-error', '');
   setPasswordVisibility(false);
-  selectTab(document.getElementById('tab-login'));
   form.elements.username.focus();
 }

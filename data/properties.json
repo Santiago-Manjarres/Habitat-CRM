@@ -30,7 +30,7 @@
     "bathrooms": 4,
     "parking": 2,
     "status": "available",
-    "agentId": "usr_admin_01",
+    "agentId": "usr_agent_02",
     "description": "Casa de dos niveles rodeada de zonas verdes, con chimenea, estudio, cuarto de servicio y amplio jardín privado.",
     "imageUrl": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
     "createdAt": "2026-10-18T15:30:00.000Z"
@@ -66,7 +66,7 @@
     "bathrooms": 1,
     "parking": 0,
     "status": "negotiation",
-    "agentId": "usr_admin_01",
+    "agentId": "usr_agent_02",
     "description": "Local esquinero con vitrina doble, alto flujo peatonal y vehicular. Ideal para restaurante o tienda.",
     "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80",
     "createdAt": "2026-10-25T11:45:00.000Z"
@@ -84,7 +84,7 @@
     "bathrooms": 3,
     "parking": 2,
     "status": "negotiation",
-    "agentId": "usr_admin_01",
+    "agentId": "usr_agent_03",
     "description": "Casa en conjunto con piscina, parque infantil y vigilancia 24 horas. Patio interior y terraza cubierta.",
     "imageUrl": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80",
     "createdAt": "2026-10-28T14:00:00.000Z"
@@ -102,7 +102,7 @@
     "bathrooms": 2,
     "parking": 2,
     "status": "available",
-    "agentId": "usr_admin_01",
+    "agentId": "usr_agent_02",
     "description": "Oficina con divisiones en vidrio, sala de juntas, recepción y acceso a auditorio compartido del edificio.",
     "imageUrl": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
     "createdAt": "2026-11-02T08:30:00.000Z"
@@ -120,7 +120,7 @@
     "bathrooms": 4,
     "parking": 3,
     "status": "sold",
-    "agentId": "usr_admin_01",
+    "agentId": "usr_agent_03",
     "description": "Penthouse de dos niveles con terraza de 60 m², jacuzzi, vista a los cerros orientales y acabados de lujo.",
     "imageUrl": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
     "createdAt": "2026-11-05T16:10:00.000Z"
@@ -156,7 +156,7 @@
     "bathrooms": 1,
     "parking": 0,
     "status": "available",
-    "agentId": "usr_admin_01",
+    "agentId": "usr_agent_03",
     "description": "Local en casona colonial restaurada, techos altos y fachada protegida. Excelente para café o galería.",
     "imageUrl": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
     "createdAt": "2026-11-12T13:00:00.000Z"

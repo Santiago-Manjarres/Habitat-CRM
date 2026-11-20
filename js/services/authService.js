@@ -1,11 +1,11 @@
 /**
- * Authentication: login against the stored users, per-tab session in
- * sessionStorage ('inmocrm_active_session'), logout and client self-registration.
+ * Authentication: login against the stored advisors, per-tab session in
+ * sessionStorage ('inmocrm_active_session') and logout. There is one kind of
+ * user (the agency's advisors); there is no public sign-up.
  */
 import { SESSION_KEY, ROLES } from '../config.js';
-import { validateLoginForm, validateRegistrationForm } from '../utils/validators.js';
-import { getInitials } from '../utils/formatters.js';
-import { getCollection, saveCollection, createId } from './storageService.js';
+import { validateLoginForm } from '../utils/validators.js';
+import { getCollection } from './storageService.js';
 
 export const LOGIN_ERROR_MESSAGE = 'Usuario o contraseña incorrectos';
 
@@ -91,7 +91,7 @@ export function revalidateSession() {
 }
 
 export function isStaff(user) {
-  return user?.role === ROLES.admin || user?.role === ROLES.agent;
+  return user?.role === ROLES.admin;
 }
 
 export function getUserById(id) {
@@ -99,35 +99,9 @@ export function getUserById(id) {
   return user ? toSessionUser(user) : null;
 }
 
-function findDuplicateErrors(data) {
-  const users = getCollection('users');
-  const errors = {};
-  if (findUserByUsername(data.username)) errors.username = 'Ese usuario ya existe. Prueba con otro';
-  const email = String(data.email).trim().toLowerCase();
-  if (users.some((user) => String(user.email ?? '').toLowerCase() === email)) {
-    errors.email = 'Ya hay una cuenta con ese correo';
-  }
-  return errors;
-}
-
-/** Creates a client account and signs it in. Returns { ok, user } or { ok: false, fieldErrors }. */
-export function registerClient(data) {
-  const check = validateRegistrationForm(data);
-  const fieldErrors = { ...check.errors, ...(check.valid ? findDuplicateErrors(data) : {}) };
-  if (Object.keys(fieldErrors).length > 0) return { ok: false, fieldErrors };
-  const name = data.name.trim();
-  const user = {
-    id: createId('usr'),
-    username: data.username.trim(),
-    password: data.password,
-    name,
-    email: data.email.trim(),
-    phone: String(data.phone ?? '').trim(),
-    role: ROLES.client,
-    avatar: getInitials(name),
-  };
-  saveCollection('users', [...getCollection('users'), user]);
-  const sessionUser = toSessionUser(user);
-  writeSession(sessionUser);
-  return { ok: true, user: sessionUser };
+/** Every advisor, without passwords, sorted by name (for selects and joins). */
+export function getAdvisors() {
+  return getCollection('users')
+    .map(toSessionUser)
+    .sort((a, b) => a.name.localeCompare(b.name, 'es'));
 }

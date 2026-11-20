@@ -39,7 +39,7 @@ function writeRaw(key, value) {
     localStorage.setItem(key, value);
   } catch (error) {
     if (error?.name === 'QuotaExceededError') {
-      throw new StorageError('No hay espacio suficiente en el navegador para guardar los cambios', error);
+      throw new StorageError('No hay espacio suficiente en este equipo para guardar los cambios', error);
     }
     persistent = false;
     memoryStore.set(key, value);
