@@ -365,7 +365,7 @@
 @media (min-width: 1024px) {
   .admin-layout {
     display: grid;
-    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-columns: 224px minmax(0, 1fr);
   }
 
   .sidebar {
@@ -375,7 +375,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
-    padding: var(--space-5) var(--space-3);
+    padding: var(--space-4) var(--space-3);
     background-color: var(--color-surface);
     box-shadow: var(--shadow-divider-right);
   }
@@ -396,21 +396,23 @@
 
 .sidebar__nav .nav-link,
 .sidebar__site {
-  min-height: var(--control-h);
-  padding-inline: var(--space-4);
-  border-radius: var(--radius-full);
+  min-height: var(--control-h-desktop);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
 }
 
-/* Active item: the one filled accent pill in the navigation */
+/* Active item: accent text and icon, no fill (Stripe's quiet navigation) */
 .sidebar__nav .nav-link[aria-current="page"] {
-  color: var(--color-on-accent);
-  background-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: var(--weight-strong);
+  background-color: transparent;
 }
 
 .sidebar__site { margin-top: auto; }
 
 /* Top bar: the advisor's chip and sign-out, at every width */
-.topbar .app-header__inner { min-height: 64px; }
+.topbar .app-header__inner { min-height: 56px; }
 
 .topbar__date {
   display: none;
@@ -439,7 +441,7 @@
 .page__header {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
 }

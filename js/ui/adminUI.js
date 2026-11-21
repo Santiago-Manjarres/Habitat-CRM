@@ -71,13 +71,10 @@ function debounce(fn, wait) {
    Summary: next step, KPIs, funnel chart, inventory by state, recent clients
    ========================================================================== */
 
-function kpiMarkup({ icon, label, value, hint }) {
+function kpiMarkup({ label, value, hint }) {
   return `
-    <article class="card kpi">
-      <div class="kpi__head">
-        <h2 class="kpi__label">${escapeHTML(label)}</h2>
-        <span class="kpi__icon">${iconMarkup(icon)}</span>
-      </div>
+    <article class="kpi">
+      <h2 class="kpi__label">${escapeHTML(label)}</h2>
       <p class="kpi__value">${escapeHTML(value)}</p>
       <p class="kpi__hint">${escapeHTML(hint)}</p>
     </article>`;
@@ -86,10 +83,10 @@ function kpiMarkup({ icon, label, value, hint }) {
 function kpiCards() {
   const k = getDashboardKpis();
   return [
-    { icon: 'building', label: 'Propiedades disponibles', value: formatNumber(k.availableProperties), hint: `de ${pluralize(k.totalProperties, 'propiedad', 'propiedades')} en el inventario` },
-    { icon: 'sparkle', label: 'Valor del inventario en venta', value: formatCompactCurrency(k.availableInventoryValue), hint: `${formatCurrency(k.availableInventoryValue)} en ${pluralize(k.availableForSaleCount, 'inmueble', 'inmuebles')}` },
-    { icon: 'user', label: 'Clientes en seguimiento', value: formatNumber(k.activeLeads), hint: k.newLeads ? `${pluralize(k.newLeads, 'nuevo', 'nuevos')} por contactar` : 'Todos contactados' },
-    { icon: 'check-circle', label: 'Tasa de cierre', value: k.winRate === null ? '—' : `${k.winRate} %`, hint: k.closedDeals ? `${pluralize(k.wonDeals, 'negocio cerrado', 'negocios cerrados')} de ${pluralize(k.closedDeals, 'terminado', 'terminados')}` : 'Aún no hay negocios terminados' },
+    { label: 'Propiedades disponibles', value: formatNumber(k.availableProperties), hint: `de ${pluralize(k.totalProperties, 'propiedad', 'propiedades')} en el inventario` },
+    { label: 'Valor del inventario en venta', value: formatCompactCurrency(k.availableInventoryValue), hint: `${formatCurrency(k.availableInventoryValue)} en ${pluralize(k.availableForSaleCount, 'inmueble', 'inmuebles')}` },
+    { label: 'Clientes en seguimiento', value: formatNumber(k.activeLeads), hint: k.newLeads ? `${pluralize(k.newLeads, 'nuevo', 'nuevos')} por contactar` : 'Todos contactados' },
+    { label: 'Tasa de cierre', value: k.winRate === null ? '—' : `${k.winRate} %`, hint: k.closedDeals ? `${pluralize(k.wonDeals, 'negocio cerrado', 'negocios cerrados')} de ${pluralize(k.closedDeals, 'terminado', 'terminados')}` : 'Aún no hay negocios terminados' },
   ];
 }
 
@@ -98,15 +95,15 @@ function funnelChartMarkup() {
   const data = getFunnelCounts();
   const max = Math.max(1, ...data.map((d) => d.count));
   const topIndex = data.findIndex((d) => d.count === max);
-  const [W, H, BAR, TOP] = [500, 200, 56, 24];
+  const [W, H, BAR, TOP] = [680, 220, 40, 24];
   const step = W / data.length;
   const bars = data.map((d, i) => {
     const h = Math.round(((H - TOP - 28) * d.count) / max);
     const x = Math.round(i * step + (step - BAR) / 2);
     const y = H - 28 - h;
     const top = i === topIndex && d.count > 0 ? ' chart__bar--top' : '';
-    return `<rect class="chart__track" x="${x}" y="${TOP}" width="${BAR}" height="${H - 28 - TOP}" rx="10"></rect>
-      <rect class="chart__bar${top}" x="${x}" y="${y}" width="${BAR}" height="${Math.max(h, 0)}" rx="10"></rect>
+    return `<rect class="chart__track" x="${x}" y="${TOP}" width="${BAR}" height="${H - 28 - TOP}" rx="6"></rect>
+      <rect class="chart__bar${top}" x="${x}" y="${y}" width="${BAR}" height="${Math.max(h, 0)}" rx="6"></rect>
       <text class="chart__value" x="${x + BAR / 2}" y="${Math.max(y - 8, 14)}" text-anchor="middle">${d.count}</text>
       <text class="chart__label" x="${x + BAR / 2}" y="${H - 6}" text-anchor="middle">${escapeHTML(d.label)}</text>`;
   }).join('');

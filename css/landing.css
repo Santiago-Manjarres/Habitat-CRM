@@ -21,7 +21,7 @@
 .close__word { line-height: 1.02; flex-shrink: 0; }
 /* on a short window the closing keeps its full height instead of squeezing the name over the links */
 footer.closing { height: auto; min-height: 100vh; min-height: 100svh; }
-footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; }
+footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; row-gap: var(--s-7); }
 
 /* Status chips shared by every visual (the CRM's own states) */
 .st {
@@ -34,6 +34,7 @@ footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; }
 .st--neg { color: #9a5b00; background: #fff4dc; }
 .st--sold { color: #b42318; background: #fdeceb; }
 .st--info { color: #1d5fd0; background: #e8f0fe; }
+.st--off { color: #4a5263; background: #eef0f3; }
 
 /* ---------------------------------------------------------------- hero window: the leads view */
 .hero--centred .hero__window { background: linear-gradient(180deg, #e9f0fb, #f5f6fa 70%); }
@@ -122,7 +123,7 @@ footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; }
 /* ---------------------------------------------------------------- bento and step panels: small pieces of the CRM */
 #funciones .panel { --p-h: 260px; }
 #como-funciona .panel { --p-h: 196px; }
-@media (max-width: 639px) { #funciones .panel { --p-h: 150px; } #como-funciona .panel { --p-h: 222px; } }
+@media (max-width: 639px) { #funciones .panel { --p-h: 132px; } #como-funciona .panel { --p-h: 222px; } }
 
 .bx { display: grid; align-content: start; padding: 24px; font-size: 13px; line-height: 1.4; color: var(--p-ink); }
 .bx-dash { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -154,3 +155,46 @@ footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; }
 .mq { margin-top: var(--s-8); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); overflow: hidden; }
 /* on a phone the three steps and the marquee need exactly two screens */
 @media (max-width: 639px) { #como-funciona { --hm: 2; } }
+
+/* ---------------------------------------------------------------- portraits inside the drawn UI */
+.hw__me { display: inline-flex; align-items: center; gap: 8px; }
+.hw__face, .bx-face { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.bx-tabs small { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+
+/* ---------------------------------------------------------------- the app frame is a working selector */
+button.af-row {
+  width: 100%; border: 0; margin: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+  transition: background-color 160ms cubic-bezier(.23, 1, .32, 1), transform 120ms cubic-bezier(.23, 1, .32, 1);
+}
+button.af-row:active { transform: scale(.985); }
+button.af-row:focus-visible { outline: 2px solid var(--p-accent); outline-offset: -2px; }
+@media (hover: hover) and (pointer: fine) { button.af-row:not(.is-on):hover { background: color-mix(in srgb, var(--u-fill) 60%, transparent); } }
+.af-open { will-change: opacity, transform; }
+
+/* ---------------------------------------------------------------- inventory: text and listing left, the liquid photograph right */
+.inv { align-items: stretch; }
+.inv__text { display: grid; grid-template-rows: auto auto 1fr; align-content: start; gap: var(--s-5); }
+.inv__text > .inv__list { align-self: end; }
+.inv__list { list-style: none; margin: var(--s-3) 0 0; padding: 6px; display: grid; gap: 2px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px #e7eaf0, 0 12px 32px rgba(27, 31, 39, .06); }
+.inv__row {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px;
+  border-radius: 12px; font-size: 13px; line-height: 1.35;
+  transition: background-color 160ms cubic-bezier(.23, 1, .32, 1);
+}
+@media (hover: hover) and (pointer: fine) { .inv__row:hover { background: #f5f6fa; } }
+.inv__thumb { display: block; width: 64px; height: 48px; border-radius: 8px; background: #eef0f3; }
+.inv__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.inv__meta { display: grid; gap: 2px; min-width: 0; }
+.inv__meta b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inv__meta small { color: var(--p-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inv__lead { margin: 0; min-height: 420px; border-radius: var(--r-lg); overflow: hidden; position: relative; }
+.inv__lead > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+@media (min-width: 1024px) { .inv__lead { min-height: min(700px, calc(100svh - 200px)); } }
+@media (max-width: 1023px) { .inv__lead { min-height: 360px; } }
+@media (max-width: 639px) {
+  .inv__lead { min-height: 0; aspect-ratio: 4 / 3; }
+  .inv__row .st { display: none; }
+}
+/* grid items never widen past their track: long names end in an ellipsis instead of running over the chips */
+.af-row > span, .af-lead > span { min-width: 0; }
+@media (prefers-reduced-motion: reduce) { .inv__row, button.af-row { transition: none; } }

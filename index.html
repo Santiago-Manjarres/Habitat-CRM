@@ -43,14 +43,15 @@
 <link rel="modulepreload" href="assets/moments/moments.js">
 <link rel="modulepreload" href="assets/moments/lib.js">
 <link rel="modulepreload" href="assets/moments/marquee-row/moment.js">
+<link rel="modulepreload" href="assets/moments/liquid-hover/moment.js">
 </head>
 <body>
 <!-- type: software (a CRM sold to real-estate agencies)
      deal: hero centred, nav nav-centre (nav-cards dealt; no photograph for its panel cards, dealt again), close close-word,
            footer footer-columns, rhythm dark-band (app-frame), buttons pill (tonal dealt; the client's references
-           CRMPro and Valtro use pill buttons), mark: the client's logo (dots dealt), grounds: none, effect: none
+           CRMPro and Valtro use pill buttons), mark: the client's logo (dots dealt), grounds: none, effect: fluted-glass on the hero window (effects.mjs pick, hero slot, quiet)
      palette: the client's own (logo blue #2667CC on white, start.mjs brand), type geist (self-hosted)
-     moments: marquee-row in #como-funciona (counter-rolls dealt; its section was sparse, the figures moved into sentences) -->
+     moments: liquid-hover in #inventario (moments.mjs pick, second deal), marquee-row in #como-funciona (counter-rolls dealt; its section was sparse, the figures moved into sentences) -->
 
 <header class="nav nav--centre">
   <div class="wrap nav__bar">
@@ -63,7 +64,7 @@
       <div class="nav__item"><a class="nav__link" href="#faq">Preguntas</a></div>
     </nav>
     <div class="nav__actions">
-      <a class="btn btn--primary" href="app.html">Ingresar al CRM</a>
+      <a class="btn btn--primary" href="app.html">Entrar al CRM</a>
     </div>
     <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menú">
       <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -75,14 +76,14 @@
   <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text">
       <div class="hero__c">
-        <a class="pill" href="#faq"><span>Desde el computador o el celular</span><span class="muted">Sin instalar nada</span></a>
+        <a class="pill" href="#como-funciona"><span>Clientes en 6 etapas</span><span class="muted">de la primera llamada al cierre</span></a>
         <h1 id="hero-h">El CRM para inmobiliarias</h1>
         <p class="hero__lead">Tus propiedades, los clientes interesados en ellas y cada negocio, desde el primer contacto hasta el cierre. Todo el equipo de asesores trabaja en el mismo lugar.</p>
-        <div class="btn-row"><a class="btn btn--primary" href="app.html">Ingresar al CRM</a><a class="btn btn--secondary" href="#como-funciona">Ver cómo funciona</a></div>
+        <div class="btn-row"><a class="btn btn--primary" href="app.html">Entrar al CRM</a><a class="btn btn--secondary" href="#como-funciona">Ver cómo funciona</a></div>
       </div>
-      <div class="hero__window" role="img" aria-label="Habitat CRM: la lista de clientes y la ficha de Paula Ruiz pasando a la etapa Visita">
+      <div class="hero__window" data-fx="fluted-glass" data-fx-seed="26" role="img" aria-label="Habitat CRM: la lista de clientes y la ficha de Paula Ruiz pasando a la etapa Visita">
         <div class="ly-piece ui hw" aria-hidden="true">
-          <div class="hw__bar"><span class="hw__dots"><i></i><i></i><i></i></span><span><b>Habitat CRM</b> · Clientes</span><span class="hw__sp"></span><span>Laura Mendoza</span></div>
+          <div class="hw__bar"><span class="hw__dots"><i></i><i></i><i></i></span><span><b>Habitat CRM</b> · Clientes</span><span class="hw__sp"></span><span class="hw__me"><img class="hw__face" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=64&h=64&q=70" alt="" width="64" height="64" loading="lazy">Laura Mendoza</span></div>
           <div class="hw__body">
             <div class="hw__list">
               <div class="hw__search">Buscar cliente</div>
@@ -109,39 +110,57 @@
     <div class="wrap">
       <div class="grid">
         <h2 id="producto-h" class="span-5">Cada propiedad con sus clientes interesados</h2>
-        <p class="span-6 start-7 t-lead">El inventario a la izquierda; a la derecha, la propiedad abierta con su precio, su estado y cada cliente interesado en ella, con la etapa en la que va su negocio. <a class="link" href="app.html">Ingresar al CRM</a></p>
+        <p class="span-6 start-7 t-lead">Elige una propiedad del inventario y a la derecha se abre su ficha: el precio, el estado y cada cliente interesado en ella, con la etapa en la que va su negocio. <a class="link" href="app.html">Entrar al CRM</a></p>
       </div>
-      <div class="ui app fill" role="img" aria-label="Habitat CRM: inventario de nueve propiedades y la Casa Campestre abierta con sus clientes interesados" data-ui-pause-host>
+      <div class="ui ui-app app fill" role="group" aria-label="Habitat CRM de ejemplo: elige una propiedad para ver sus clientes interesados" data-app-frame>
         <div class="app__pane app__pane--list">
           <div class="af-list">
-            <div class="af-list__head"><b>Propiedades</b><span>9</span></div>
-            <div class="af-row"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Local en el Centro Histórico</b><small>Cartagena · $ 380.000.000</small></span><em class="st st--ok">Disponible</em></div>
-            <div class="af-row"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Apartamento para Estrenar</b><small>Envigado · $ 1.900.000 / mes</small></span><em class="st st--ok">Disponible</em></div>
-            <div class="af-row is-on"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Casa Campestre con Jardín</b><small>Rionegro · $ 890.000.000</small></span><em class="st st--ok">Disponible</em></div>
-            <div class="af-row"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Penthouse Dúplex</b><small>Bogotá · $ 1.350.000.000</small></span><em class="st st--sold">Vendida</em></div>
-            <div class="af-row"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Oficina Ejecutiva</b><small>Bogotá · $ 4.800.000 / mes</small></span><em class="st st--ok">Disponible</em></div>
-            <div class="af-row"><img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Casa Familiar en Conjunto</b><small>Cali · $ 620.000.000</small></span><em class="st st--neg">En negociación</em></div>
-            <div class="af-row"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Local Comercial sobre Avenida</b><small>Medellín · $ 6.500.000 / mes</small></span><em class="st st--neg">En negociación</em></div>
-            <div class="af-row"><img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Apartaestudio Amoblado</b><small>Bogotá · $ 2.300.000 / mes</small></span><em class="st st--ok">Disponible</em></div>
-            <div class="af-row"><img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Apartamento con Vista al Mar</b><small>Cartagena · $ 450.000.000</small></span><em class="st st--ok">Disponible</em></div>
+            <div class="af-list__head"><b>Propiedades</b><span>7</span></div>
+            <button type="button" class="af-row" data-prop="local-centro" aria-pressed="false"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Local en el Centro Histórico</b><small>Cartagena · $ 380.000.000</small></span><em class="st st--ok">Disponible</em></button>
+            <button type="button" class="af-row" data-prop="apto-envigado" aria-pressed="false"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Apartamento para Estrenar</b><small>Envigado · $ 1.900.000 / mes</small></span><em class="st st--ok">Disponible</em></button>
+            <button type="button" class="af-row is-on" data-prop="casa-campestre" aria-pressed="true"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Casa Campestre con Jardín</b><small>Rionegro · $ 890.000.000</small></span><em class="st st--ok">Disponible</em></button>
+            <button type="button" class="af-row" data-prop="penthouse" aria-pressed="false"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Penthouse Dúplex</b><small>Bogotá · $ 1.350.000.000</small></span><em class="st st--sold">Vendida</em></button>
+            <button type="button" class="af-row" data-prop="oficina" aria-pressed="false"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Oficina Ejecutiva</b><small>Bogotá · $ 4.800.000 / mes</small></span><em class="st st--ok">Disponible</em></button>
+            <button type="button" class="af-row" data-prop="casa-cali" aria-pressed="false"><img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Casa Familiar en Conjunto</b><small>Cali · $ 620.000.000</small></span><em class="st st--neg">En negociación</em></button>
+            <button type="button" class="af-row" data-prop="local-poblado" aria-pressed="false"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=160&q=70" alt="" width="64" height="48" loading="lazy"><span><b>Local Comercial sobre Avenida</b><small>Medellín · $ 6.500.000 / mes</small></span><em class="st st--neg">En negociación</em></button>
           </div>
         </div>
         <div class="app__pane app__pane--open">
-          <div class="af-open">
+          <div class="af-open" aria-live="polite">
             <div class="af-open__top">
               <div><p class="af-kicker">Venta · Casa · Llanogrande, Rionegro</p><p class="af-title">Casa Campestre con Jardín y Chimenea</p></div>
               <p class="af-price">$ 890.000.000</p>
             </div>
             <p class="af-facts"><span>280 m²</span><span>4 habitaciones</span><span>4 baños</span><span>2 parqueaderos</span><span>Asesor: Andrés Rojas</span></p>
-            <p class="af-sub">Clientes interesados</p>
-            <div class="af-leads" data-ly-steps="1100">
+            <p class="af-sub">Clientes interesados · 4</p>
+            <div class="af-leads">
               <div class="af-lead"><i>FA</i><span><b>Felipe Arango</b><small>Referido · ofertó $ 850 millones</small></span><em class="st st--neg">Negociación</em></div>
               <div class="af-lead"><i>LV</i><span><b>Lucía Vargas</b><small>Portal web · pidió el certificado de tradición</small></span><em class="st st--info">Contactado</em></div>
               <div class="af-lead"><i>MT</i><span><b>Mateo Torres</b><small>Llamada · visita el jueves a las 4:00 p. m.</small></span><em class="st st--neg">Visita</em></div>
-              <div class="af-lead" data-step><i>CS</i><span><b>Camila Suárez</b><small>WhatsApp · registrado hace un momento</small></span><em class="st st--info">Nuevo</em></div>
+              <div class="af-lead"><i>CS</i><span><b>Camila Suárez</b><small>WhatsApp · registrado hace un momento</small></span><em class="st st--info">Nuevo</em></div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="inventario" aria-labelledby="inventario-h">
+    <div class="wrap">
+      <div class="grid inv">
+        <div class="span-6 inv__text">
+          <h2 id="inventario-h">El inventario con la foto de cada inmueble</h2>
+          <p class="t-lead">Pega el enlace de la foto al crear la propiedad. El equipo la reconoce de un vistazo, con su estado al lado.</p>
+          <ul class="ui inv__list" role="list" aria-label="Propiedades de ejemplo">
+            <li class="inv__row"><span class="inv__thumb m-zoom"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=160&h=120&q=70" alt="" width="160" height="120" loading="lazy"></span><span class="inv__meta"><b>Casa con Piscina en Pance</b><small>Venta · Cali</small></span><em class="st st--ok">Disponible</em></li>
+            <li class="inv__row"><span class="inv__thumb m-zoom"><img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=160&h=120&q=70" alt="" width="160" height="120" loading="lazy"></span><span class="inv__meta"><b>Apartamento Remodelado</b><small>Arriendo · Laureles, Medellín</small></span><em class="st st--neg">En negociación</em></li>
+            <li class="inv__row"><span class="inv__thumb m-zoom"><img src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=160&h=120&q=70" alt="" width="160" height="120" loading="lazy"></span><span class="inv__meta"><b>Casa Esquinera en Conjunto</b><small>Venta · Chía, Cundinamarca</small></span><em class="st st--ok">Disponible</em></li>
+            <li class="inv__row"><span class="inv__thumb m-zoom"><img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=160&h=120&q=70" alt="" width="160" height="120" loading="lazy"></span><span class="inv__meta"><b>Loft con Doble Altura</b><small>Venta · Usaquén, Bogotá</small></span><em class="st st--sold">Vendida</em></li>
+          </ul>
+        </div>
+        <figure class="span-6 start-7 inv__lead" data-moment="liquid-hover" data-moment-opts='{"strength": 0.8}'>
+          <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1600&h=1300&q=70" alt="Casa moderna de dos pisos con piscina y jardín" width="1600" height="1300" loading="lazy">
+        </figure>
       </div>
     </div>
   </section>
@@ -150,11 +169,11 @@
     <div class="wrap">
       <div class="group">
         <div class="section-head">
-          <h2 id="funciones-h">Funciones de Habitat CRM. <span class="muted">Lo justo para que ningún interesado se quede sin respuesta.</span></h2>
+          <h2 id="funciones-h">Funciones de Habitat CRM. <span class="muted">Lo justo para no perder a ningún cliente.</span></h2>
         </div>
         <div class="grid">
           <article class="card card--row card--open span-6">
-            <h3>El negocio de un vistazo</h3>
+            <h3>El resumen del CRM</h3>
             <p>Propiedades disponibles, clientes en seguimiento y negocios cerrados, con las cifras de hoy.</p>
             <div class="panel"><div class="ui bx">
               <div class="bx-dash">
@@ -168,7 +187,7 @@
             </div></div>
           </article>
           <article class="card card--row card--open span-6">
-            <h3>Encuentra cualquier propiedad</h3>
+            <h3>Búsqueda en el inventario</h3>
             <p>Escribe el nombre o la ciudad, con o sin tildes: «bogota» encuentra los inmuebles de Bogotá.</p>
             <div class="panel"><div class="ui bx">
               <div class="bx-search"><span class="bx-field">bogota</span><span class="bx-hit">Apartaestudio Amoblado · Chapinero Alto, Bogotá</span><span class="bx-hit">Oficina Ejecutiva · Santa Bárbara, Bogotá</span><span class="bx-hit">Penthouse Dúplex · Rosales, Bogotá</span></div>
@@ -178,17 +197,17 @@
       </div>
       <div class="grid">
         <article class="card card--row card--open span-6">
-          <h3>Fichas completas y sin errores</h3>
+          <h3>Fichas del inventario sin errores</h3>
           <p>Si falta el título o el área quedó en cero, el CRM te avisa antes de guardar la propiedad.</p>
           <div class="panel"><div class="ui bx">
             <div class="bx-form"><span class="bx-label">Área (m²)</span><span class="bx-field is-bad">0</span><span class="bx-err">El área debe ser mayor que 0</span></div>
           </div></div>
         </article>
         <article class="card card--row card--open span-6">
-          <h3>Todo el equipo al día</h3>
+          <h3>Clientes al día para todo el equipo</h3>
           <p>Cuando un asesor avanza un cliente de etapa, sus compañeros lo ven al momento.</p>
           <div class="panel"><div class="ui bx">
-            <div class="bx-tabs"><span><small>Laura Mendoza</small>Movió a Ana Gómez a Visita</span><span><small>Andrés Rojas lo ve al instante</small>Ana Gómez · Visita</span></div>
+            <div class="bx-tabs"><span><small><img class="bx-face" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=64&h=64&q=70" alt="" width="64" height="64" loading="lazy">Laura Mendoza</small>Movió a Ana Gómez a Visita</span><span><small><img class="bx-face" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=64&h=64&q=70" alt="" width="64" height="64" loading="lazy">Andrés Rojas lo ve al instante</small>Ana Gómez · Visita</span></div>
           </div></div>
         </article>
       </div>
@@ -201,19 +220,19 @@
       <div class="grid">
         <article class="card card--row card--open span-4">
           <span class="step-num">1</span>
-          <h3>Registra al cliente</h3>
+          <h3>Registro de clientes</h3>
           <p>Nombre, teléfono o correo, cómo llegó y la propiedad que le interesa.</p>
           <div class="panel"><div class="ui bx"><div class="bx-form"><span class="bx-label">Nombre del cliente</span><span class="bx-field">Camila Suárez</span><span class="bx-label">Cómo llegó</span><span class="bx-field">WhatsApp</span></div></div></div>
         </article>
         <article class="card card--row card--open span-4">
           <span class="step-num">2</span>
-          <h3>Acompáñalo en cada etapa</h3>
+          <h3>Etapas de los clientes</h3>
           <p>Llamada, visita, negociación: cambias su etapa desde su tarjeta.</p>
           <div class="panel"><div class="ui bx"><div class="bx-stage"><span class="st st--info">Contactado</span><span class="bx-arrow">→</span><span class="st st--neg">Visita</span></div></div></div>
         </article>
         <article class="card card--row card--open span-4">
           <span class="step-num">3</span>
-          <h3>Cierra el negocio</h3>
+          <h3>Cierre del negocio en el CRM</h3>
           <p>Márcalo como cerrado y el resumen lo suma a tu tasa de cierre.</p>
           <div class="panel"><div class="ui bx"><div class="bx-stage"><span class="st st--neg">Negociación</span><span class="bx-arrow">→</span><span class="st st--ok">Negocio cerrado</span></div></div></div>
         </article>
@@ -248,7 +267,7 @@
     <div class="closing__cta close--word">
       <div class="section-head--split">
         <div><h2 id="close-h">Conoce Habitat CRM por dentro</h2><p class="t-lead">Entra con la cuenta de prueba (usuario admin, contraseña admin). La pantalla de acceso llena los datos por ti.</p></div>
-        <a class="btn btn--primary" href="app.html">Ingresar al CRM<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+        <a class="btn btn--primary" href="app.html">Entrar al CRM<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
       </div>
       <p class="close__word" aria-hidden="true">Habitat</p>
     </div>
@@ -273,5 +292,6 @@
 <script type="module" src="assets/system.js"></script>
 <script type="module" src="assets/motion/motion.js"></script>
 <script type="module" src="assets/layout/layout.js"></script>
+<script type="module" src="js/landing.js"></script>
 </body>
 </html>

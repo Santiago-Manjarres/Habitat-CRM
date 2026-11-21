@@ -61,9 +61,10 @@ HABITAT CRM/
 │   ├── base.css            Fuente, reset, tipografía, foco visible, prefers-reduced-motion
 │   ├── components.css      Botones, campos, badges, KPIs, paneles, gráfico, tablas, modal, toasts, kanban
 │   ├── layout.css          Login, sidebar, barra superior, navegación móvil
-│   └── landing.css         Solo para la landing: la fuente y el interior de sus visuales
+│   └── landing.css         Solo para la landing: la fuente, el interior de sus visuales y la sección de inventario
 └── js/
     ├── app.js              Arranque del CRM, guardia de sesión, navegación por #hash, eventos de datos
+    ├── landing.js          Landing: el selector de propiedades del inventario de ejemplo
     ├── config.js           Claves, canal de sincronización, etiquetas, datos semilla embebidos
     ├── services/           Lo único que toca localStorage, sessionStorage y fetch
     │   ├── storageService.js   Carga semilla y lectura/escritura (exportar/importar siguen aquí, sin uso en la UI)
@@ -90,11 +91,18 @@ La UI llama a los servicios, y los servicios leen y escriben en `localStorage`. 
 
 ### Diseño
 
-- **CRM:** inspirado en las referencias CRMPro y Valtro. Usa Geist; fondo gris azulado claro con tarjetas blancas de sombra suave; el azul del logo (`#2667CC`) como único acento en botones píldora, navegación activa y gráficos. Movimiento máximo de 280 ms y solo fundidos con `prefers-reduced-motion`.
+- **CRM:** al estilo del panel de Stripe.
+  - Un solo lienzo blanco, con bordes finos en lugar de sombras y secciones planas: título, línea divisoria y contenido.
+  - Controles pequeños: 32 px en escritorio (44 px de área táctil en el celular), radio de 6 px en botones y de 8 px en tarjetas.
+  - Los cuatro indicadores van en una sola franja dividida por líneas finas.
+  - Navegación lateral discreta: el ítem activo se marca solo con el color de acento.
+  - Usa Geist, con el azul del logo (`#2667CC`) como único acento. Movimiento máximo de 280 ms y solo fundidos con `prefers-reduced-motion`.
 - **Landing:** construida con la skill *taste-skill* (tipo `software`).
-  - **Hero `centred`:** la vista de clientes del CRM dibujada en HTML vivo.
-  - **`app-frame` sobre fondo oscuro:** el inventario junto a una propiedad con sus clientes interesados.
-  - **Resto:** funciones en 2x2, proceso en 3 pasos con el momento `marquee-row`, preguntas frecuentes y cierre `close-word`.
+  - **Hero `centred`:** la vista de clientes del CRM dibujada en HTML vivo, sobre el efecto WebGL `fluted-glass` (vidrio estriado) repartido por la skill.
+  - **`app-frame` sobre fondo oscuro, interactivo:** al hacer clic en una propiedad del inventario se abre su ficha con sus clientes interesados (`js/landing.js`).
+  - **Inventario con fotos:** una lista de propiedades con miniaturas y una foto grande con el momento `liquid-hover`, que ondula como agua bajo el cursor.
+  - **Resto:** funciones en 2x2 (con retratos de los asesores), proceso en 3 pasos con el momento `marquee-row`, preguntas frecuentes y cierre `close-word`.
+  - **Fotos:** de Unsplash, enlazadas directamente; los créditos van en una sola línea del pie de página.
   - **Contenido:** escrito para el dueño de una inmobiliaria, sin términos técnicos; describe solo funciones reales del CRM, sin clientes, cifras ni testimonios inventados.
 
 ---
@@ -136,10 +144,9 @@ La UI llama a los servicios, y los servicios leen y escriben en `localStorage`. 
 | QA-15 | Movimiento y movimiento reducido | Pasa |
 | QA-16 | Estados vacío, carga y error | Pasa |
 
-**Landing (`index.html`):** el *gate* de taste-skill terminó en **OPEN 2** tras sus 3 rondas. Quedan abiertos dos avisos `bleed-one-side` del momento `marquee-row`: su riel animado se mide más allá del contenedor aunque está recortado. Además se registraron 4 excepciones justificadas en `.taste-skill/waivers.json`:
-- Las filas de la lista del `app-frame` que se cortan bajo el fundido, como pide la receta (2).
+**Landing (`index.html`):** el *gate* de taste-skill pasó de 26 fallos a 1 en sus 3 rondas. El último («Funciones» medía 2,01 pantallas en el celular) se corrigió después, y `check.mjs` lo confirma sin hallazgos a 1440, 1024, 820, 768 y 390 px. Hay 4 excepciones justificadas en `.taste-skill/waivers.json`:
 - La sección de preguntas sin imagen, que la guía permite.
-- El riel del marquee.
+- El riel del marquee (`row-lines`) y sus dos pistas (`bleed-one-side`): están recortadas dentro del contenedor y se desvanecen en ambos bordes.
 
 ### Limitaciones conocidas
 
