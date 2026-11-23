@@ -1,95 +1,55 @@
 /**
- * Cross-tab synchronization.
- * Primary transport: BroadcastChannel ('inmocrm_sync_channel'): one message per save,
- * delivered and emitted immediately (no timers, so hidden tabs are not throttled).
- * Fallback: the window 'storage' event, used only where BroadcastChannel is unavailable,
- * so a change never produces two renders.
+ * Keeps every open tab up to date.
+ *  - Same browser: a BroadcastChannel message arrives as soon as a tab saves.
+ *  - Other browsers or computers: every 2 seconds the tab asks the Java server
+ *    for its data version (GET /api/version); if it changed, it reloads.
  */
-import { SYNC_CHANNEL_NAME, STORAGE_KEYS } from '../config.js';
+import { SYNC_CHANNEL_NAME, SYNC_POLL_MS } from '../config.js';
+import { request } from './api.js';
 
 const listeners = new Set();
-const tabId = createTabId();
 let channel = null;
-let started = false;
+let reload = async () => false;
+let knownVersion = () => 0;
 
-function createTabId() {
-  try {
-    return crypto.randomUUID();
-  } catch {
-    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
-  }
-}
-
-function emit(event) {
+function emit(entity, origin) {
   listeners.forEach((listener) => {
     try {
-      listener(event);
+      listener({ type: 'DATA_UPDATED', entity, origin });
     } catch (error) {
       console.error('[syncService] Listener failed', error);
     }
   });
 }
 
-function emitRemote(entity) {
-  emit({ type: 'DATA_UPDATED', entity, origin: 'remote', timestamp: Date.now() });
+async function reloadAndEmit() {
+  if (await reload()) emit('all', 'remote');
 }
 
-function handleChannelMessage({ data }) {
-  if (!data || data.type !== 'DATA_UPDATED' || data.sourceId === tabId) return;
-  emitRemote(data.entity);
+async function checkVersion() {
+  if (document.hidden) return;
+  const data = await request('GET', '/version');
+  if (data.ok && knownVersion() && data.version !== knownVersion()) reloadAndEmit();
 }
 
-function handleStorageEvent(event) {
-  if (channel) return; // BroadcastChannel already delivers this change
-  if (event.key === null) {
-    emitRemote('all');
-    return;
+/** options.reload() downloads the data again; options.version() says which version this tab has. */
+export function initSync(options) {
+  reload = options.reload;
+  knownVersion = options.version;
+  if (typeof BroadcastChannel !== 'undefined') {
+    channel = new BroadcastChannel(SYNC_CHANNEL_NAME);
+    channel.onmessage = () => reloadAndEmit();
   }
-  const entity = Object.keys(STORAGE_KEYS).find((name) => STORAGE_KEYS[name] === event.key);
-  if (entity) emitRemote(entity);
+  setInterval(checkVersion, SYNC_POLL_MS);
 }
 
-function openChannel() {
-  if (typeof BroadcastChannel === 'undefined') return null;
-  try {
-    const instance = new BroadcastChannel(SYNC_CHANNEL_NAME);
-    instance.onmessage = handleChannelMessage;
-    return instance;
-  } catch (error) {
-    console.warn('[syncService] BroadcastChannel unavailable, using storage events only', error);
-    return null;
-  }
-}
-
-/** Starts listening to other tabs. Safe to call more than once. */
-export function initSync() {
-  if (started) return;
-  started = true;
-  channel = openChannel();
-  window.addEventListener('storage', handleStorageEvent);
-}
-
-/**
- * Announces that an entity changed ('users' | 'properties' | 'leads' | 'all').
- * Other tabs receive it through the channel; this tab's listeners are notified
- * immediately with origin 'local'.
- */
+/** Called after this tab saved something: tell the other tabs and redraw this one. */
 export function notifyChange(entity) {
-  const message = { type: 'DATA_UPDATED', entity, timestamp: Date.now(), sourceId: tabId };
-  try {
-    channel?.postMessage(message);
-  } catch (error) {
-    console.warn('[syncService] Could not broadcast change', error);
-  }
-  emit({ type: message.type, entity, origin: 'local', timestamp: message.timestamp });
+  channel?.postMessage({ type: 'DATA_UPDATED', entity });
+  emit(entity, 'local');
 }
 
-/** Subscribes to data changes. Returns an unsubscribe function. */
 export function subscribe(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
-}
-
-export function isRealtimeSupported() {
-  return channel !== null;
 }

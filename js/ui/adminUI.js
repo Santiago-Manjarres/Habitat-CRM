@@ -1,30 +1,24 @@
 /**
  * Advisor panel (the only interface): dashboard (next step, KPIs, funnel chart,
- * recent clients), property CRUD (table + modal form) and client management
- * (kanban, create / edit / delete). In the interface a lead is called a "cliente".
+ * recent clients), property table and form, and the client board.
+ * This file only draws: the data, the figures and every rule come ready from the
+ * Java server through dataService.js. In the interface a lead is called a "cliente".
  */
 import {
   PROPERTY_TYPES, OPERATION_LABELS, PROPERTY_STATUS_LABELS, LEAD_STAGE_LABELS, LEAD_SOURCE_LABELS,
-  STATUS_TONES, SEARCH_DEBOUNCE_MS,
+  STATUS_TONES, SEARCH_DEBOUNCE_MS, LIMITS,
 } from '../config.js';
 import {
   escapeHTML, iconMarkup, badgeMarkup, imageMarkup, formatCurrency, formatCompactCurrency,
   formatNumber, formatRelativeTime, parseNumber, pluralize, getInitials,
 } from '../utils/formatters.js';
-import { validatePropertyData, validateLeadData, LIMITS } from '../utils/validators.js';
 import {
-  getProperties, getPropertyById, filterProperties, createProperty, updateProperty,
-  changePropertyStatus, deleteProperty, countLinkedLeads, normalizePropertyInput,
-} from '../services/propertyService.js';
-import {
-  getLeads, getLeadsWithDetails, groupLeadsByStage, updateLeadStage, getLeadById, createLead, updateLead,
-  deleteLead, normalizeLeadInput, getDashboardKpis, getFunnelCounts, getRecentLeads,
-  STAGE_OPTIONS, SOURCE_OPTIONS,
-} from '../services/leadService.js';
-import { getAdvisors } from '../services/authService.js';
-import { getCollection } from '../services/storageService.js';
+  getProperties, getPropertyById, searchProperties, createProperty, updateProperty, changePropertyStatus,
+  deleteProperty, getLeads, getLeadById, getBoard, getSummary, getAdvisors, createLead, updateLead,
+  updateLeadStage, deleteLead, validateProperty, validateLead, STAGE_OPTIONS, SOURCE_OPTIONS,
+} from '../services/dataService.js';
 import { showToast, openModal, confirmDialog } from './toastUI.js';
-import { showFieldErrors, enableLiveValidation } from './authUI.js';
+import { showFieldErrors, enableLiveValidation, setButtonLoading } from './authUI.js';
 
 const state = { user: null, propertyQuery: '', bound: false };
 
@@ -81,7 +75,7 @@ function kpiMarkup({ label, value, hint }) {
 }
 
 function kpiCards() {
-  const k = getDashboardKpis();
+  const k = getSummary().kpis;
   return [
     { label: 'Propiedades disponibles', value: formatNumber(k.availableProperties), hint: `de ${pluralize(k.totalProperties, 'propiedad', 'propiedades')} en el inventario` },
     { label: 'Valor del inventario en venta', value: formatCompactCurrency(k.availableInventoryValue), hint: `${formatCurrency(k.availableInventoryValue)} en ${pluralize(k.availableForSaleCount, 'inmueble', 'inmuebles')}` },
@@ -92,7 +86,7 @@ function kpiCards() {
 
 /** Vertical bars per funnel stage (SVG; colours come from CSS classes). */
 function funnelChartMarkup() {
-  const data = getFunnelCounts();
+  const data = getSummary().funnel;
   const max = Math.max(1, ...data.map((d) => d.count));
   const topIndex = data.findIndex((d) => d.count === max);
   const [W, H, BAR, TOP] = [680, 220, 40, 24];
@@ -112,10 +106,8 @@ function funnelChartMarkup() {
 }
 
 function inventoryMarkup() {
-  const properties = getCollection('properties');
-  const rows = Object.entries(PROPERTY_STATUS_LABELS).map(([status, label]) => {
-    const count = properties.filter((p) => p.status === status).length;
-    const pct = properties.length ? Math.round((count / properties.length) * 100) : 0;
+  const rows = getSummary().inventory.map(({ status, count, pct }) => {
+    const label = PROPERTY_STATUS_LABELS[status];
     return `
       <li class="meter">
         <span class="meter__top">${badgeMarkup(label, STATUS_TONES.property[status])}<strong class="tabular">${count}</strong></span>
@@ -146,7 +138,7 @@ function recentLeadRow(lead) {
 }
 
 function recentLeadsMarkup() {
-  const leads = getRecentLeads(5);
+  const leads = getSummary().recent;
   if (!leads.length) return '<p class="text-muted">Aún no hay clientes. Registra el primero con «Nuevo cliente».</p>';
   return `
     <table class="data-table">
@@ -166,7 +158,7 @@ function panelMarkup(title, body, { action = '', className = '' } = {}) {
 
 /** The one thing to do today: clients nobody has called yet. */
 function nextStepMarkup() {
-  const pending = getLeads().filter((lead) => lead.stage === 'new').length;
+  const pending = getSummary().pending;
   const title = pending
     ? `Tienes ${pluralize(pending, 'cliente nuevo', 'clientes nuevos')} por contactar`
     : 'Todos los clientes nuevos ya fueron contactados';
@@ -262,11 +254,13 @@ function propertyTableMarkup(rows) {
     </div>`;
 }
 
-function renderPropertyTable() {
+async function renderPropertyTable() {
   const container = document.getElementById('admin-property-table');
   if (!container) return;
   const all = getProperties();
-  const rows = filterProperties(all, { query: state.propertyQuery });
+  const query = state.propertyQuery.trim();
+  const rows = query ? await searchProperties(query) : all;
+  if (query !== state.propertyQuery.trim()) return; // a newer search is already on its way
   document.getElementById('admin-property-count').textContent = pluralize(rows.length, 'propiedad', 'propiedades');
   if (all.length === 0) {
     container.innerHTML = emptyStateMarkup({ icon: 'building', title: 'Aún no hay propiedades', text: 'Registra la primera para empezar a asociarle clientes interesados.', action: `<button type="button" class="btn btn--primary" data-action="new-property">${iconMarkup('plus')}Crear propiedad</button>` });
@@ -340,14 +334,23 @@ function bindPriceFormatting(form) {
   });
 }
 
-function submitPropertyForm(modal, propertyId) {
+/** Shows what the server answered: field errors, a general error or nothing. */
+function showServerErrors(form, result) {
+  if (result.errors) showFieldErrors(form, result.errors)?.focus();
+  const message = result.errors?._form ?? result.error;
+  if (message) showToast(message, { type: 'error' });
+}
+
+async function submitPropertyForm(modal, propertyId) {
   const form = modal.element.querySelector('#property-form');
+  const submit = modal.element.querySelector('[type="submit"]');
   const values = readPropertyForm(form);
-  const result = propertyId ? updateProperty(propertyId, values) : createProperty(values, state.user.id);
+  setButtonLoading(submit, true);
+  const result = propertyId ? await updateProperty(propertyId, values) : await createProperty(values);
+  setButtonLoading(submit, false);
   if (!result.ok) {
-    showFieldErrors(form, result.errors)?.focus();
-    enableLiveValidation(form, () => validatePropertyData(normalizePropertyInput(readPropertyForm(form))).errors);
-    if (result.errors._form) showToast(result.errors._form, { type: 'error' });
+    showServerErrors(form, result);
+    enableLiveValidation(form, () => validateProperty(readPropertyForm(form)));
     return;
   }
   modal.close();
@@ -382,7 +385,7 @@ function openPropertyForm(propertyId = null) {
 async function handleDeleteProperty(propertyId) {
   const property = getPropertyById(propertyId);
   if (!property) return;
-  const linked = countLinkedLeads(propertyId);
+  const linked = property.linkedLeads ?? 0;
   const leadsNote = linked ? ` También se ${linked === 1 ? 'eliminará' : 'eliminarán'} ${escapeHTML(pluralize(linked, 'cliente interesado', 'clientes interesados'))}.` : '';
   const confirmed = await confirmDialog({
     title: 'Eliminar propiedad',
@@ -390,12 +393,12 @@ async function handleDeleteProperty(propertyId) {
     confirmLabel: 'Eliminar',
   });
   if (!confirmed) return;
-  const result = deleteProperty(propertyId);
+  const result = await deleteProperty(propertyId);
   showToast(result.ok ? 'Propiedad eliminada' : result.error, { type: result.ok ? 'success' : 'error' });
 }
 
-function handleStatusChange(select) {
-  const result = changePropertyStatus(select.dataset.id, select.value);
+async function handleStatusChange(select) {
+  const result = await changePropertyStatus(select.dataset.id, select.value);
   if (!result.ok) {
     showToast(result.error, { type: 'error' });
     return;
@@ -483,12 +486,11 @@ function kanbanColumnMarkup(column) {
 }
 
 function renderLeads() {
-  const leads = getLeadsWithDetails();
-  if (leads.length === 0) {
+  if (getLeads().length === 0) {
     roots.leads().innerHTML = emptyStateMarkup({ icon: 'funnel', title: 'Aún no hay clientes', text: 'Cada persona que llame, escriba o visite la oficina por una propiedad se registra aquí para seguirla hasta el cierre.', action: `<button type="button" class="btn btn--primary" data-action="new-lead">${iconMarkup('plus')}Registrar el primer cliente</button>` });
     return;
   }
-  renderKeepingFocus(roots.leads(), `<div class="kanban">${groupLeadsByStage(leads).map(kanbanColumnMarkup).join('')}</div>`);
+  renderKeepingFocus(roots.leads(), `<div class="kanban">${getBoard().map(kanbanColumnMarkup).join('')}</div>`);
 }
 
 /* ---------- Lead form (create / edit) ---------- */
@@ -547,14 +549,16 @@ function leadFooterMarkup(isEdit) {
     <button type="submit" class="btn btn--primary" form="lead-form">${isEdit ? 'Guardar cambios' : 'Guardar cliente'}</button>`;
 }
 
-function submitLeadForm(modal, leadId) {
+async function submitLeadForm(modal, leadId) {
   const form = modal.element.querySelector('#lead-form');
+  const submit = modal.element.querySelector('[type="submit"]');
   const values = Object.fromEntries(new FormData(form).entries());
-  const result = leadId ? updateLead(leadId, values) : createLead(values);
+  setButtonLoading(submit, true);
+  const result = leadId ? await updateLead(leadId, values) : await createLead(values);
+  setButtonLoading(submit, false);
   if (!result.ok) {
-    showFieldErrors(form, result.errors)?.focus();
-    enableLiveValidation(form, () => validateLeadData(normalizeLeadInput(Object.fromEntries(new FormData(form).entries()))).errors);
-    if (result.errors._form) showToast(result.errors._form, { type: 'error' });
+    showServerErrors(form, result);
+    enableLiveValidation(form, () => validateLead(Object.fromEntries(new FormData(form).entries())));
     return;
   }
   modal.close();
@@ -568,7 +572,7 @@ async function handleDeleteLead(modal, lead) {
     confirmLabel: 'Eliminar',
   });
   if (!confirmed) return;
-  const result = deleteLead(lead.id);
+  const result = await deleteLead(lead.id);
   modal.close();
   showToast(result.ok ? 'Cliente eliminado' : result.error, { type: result.ok ? 'success' : 'error' });
 }
@@ -588,9 +592,9 @@ function openLeadForm(leadId = null) {
 }
 
 function bindLeadsRoot(root) {
-  root.addEventListener('change', (event) => {
+  root.addEventListener('change', async (event) => {
     if (event.target.dataset.action !== 'stage') return;
-    const result = updateLeadStage(event.target.dataset.id, event.target.value);
+    const result = await updateLeadStage(event.target.dataset.id, event.target.value);
     showToast(result.ok ? `Etapa cambiada a «${LEAD_STAGE_LABELS[event.target.value]}»` : result.error, { type: result.ok ? 'success' : 'error' });
   });
 }
@@ -603,7 +607,7 @@ function skeletonRows(count) {
   return `<div class="section-stack" role="status" aria-label="Cargando">${'<div class="skeleton skeleton--w80" aria-hidden="true"></div>'.repeat(count)}</div>`;
 }
 
-/** Loading state shown while seed data is being prepared. */
+/** Loading state shown while the data arrives from the server. */
 export function renderAdminLoading() {
   roots.summary().innerHTML = `<div class="kpi-grid" role="status" aria-label="Cargando indicadores">${'<div class="card kpi" aria-hidden="true"><div class="skeleton skeleton--w60"></div><div class="skeleton skeleton--w40"></div></div>'.repeat(4)}</div>`;
   ['properties', 'leads'].forEach((key) => { roots[key]().innerHTML = skeletonRows(4); });

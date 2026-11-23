@@ -1,64 +1,37 @@
 /**
- * Authentication: login against the stored advisors, per-tab session in
- * sessionStorage ('inmocrm_active_session') and logout. There is one kind of
- * user (the agency's advisors); there is no public sign-up.
+ * Session of this tab. The Java server checks the username and password and
+ * hands back the advisor and a session code; this tab keeps both in
+ * sessionStorage ('inmocrm_active_session') so each tab can have its own advisor.
  */
-import { SESSION_KEY, ROLES } from '../config.js';
-import { validateLoginForm } from '../utils/validators.js';
-import { getCollection } from './storageService.js';
-
-export const LOGIN_ERROR_MESSAGE = 'Usuario o contraseña incorrectos';
-
-let memorySession = null; // fallback when sessionStorage is blocked
-
-function toSessionUser(user) {
-  const { password, ...safeUser } = user;
-  return safeUser;
-}
-
-function writeSession(sessionUser) {
-  memorySession = sessionUser;
-  try {
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
-  } catch {
-    /* sessionStorage blocked: keep the in-memory session for this page */
-  }
-}
+import { SESSION_KEY } from '../config.js';
+import { request } from './api.js';
+import { getAdvisors } from './dataService.js';
 
 function readSession() {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
+    return JSON.parse(sessionStorage.getItem(SESSION_KEY) ?? 'null');
   } catch {
-    return memorySession;
+    return null;
   }
 }
 
-function normalizeUsername(username) {
-  return String(username ?? '').trim().toLowerCase();
+function writeSession(session) {
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } catch {
+    /* storage blocked: the session only lasts while the page is open */
+  }
 }
 
-function findUserByUsername(username) {
-  const wanted = normalizeUsername(username);
-  return getCollection('users').find((user) => normalizeUsername(user.username) === wanted) ?? null;
-}
-
-/**
- * Username is case-insensitive, password is case-sensitive.
- * Returns { ok: true, user } or { ok: false, error, fieldErrors? }.
- */
-export function login(username, password) {
-  const check = validateLoginForm({ username, password });
-  if (!check.valid) return { ok: false, error: null, fieldErrors: check.errors };
-  const user = findUserByUsername(username);
-  if (!user || user.password !== password) return { ok: false, error: LOGIN_ERROR_MESSAGE };
-  const sessionUser = toSessionUser(user);
-  writeSession(sessionUser);
-  return { ok: true, user: sessionUser };
+/** Returns { ok, user } or { ok: false, error, fieldErrors }. */
+export async function login(username, password) {
+  const result = await request('POST', '/sesion', { username, password });
+  if (result.ok) writeSession({ user: result.user, token: result.token });
+  return result;
 }
 
 export function logout() {
-  memorySession = null;
+  if (readSession()) request('DELETE', '/sesion');
   try {
     sessionStorage.removeItem(SESSION_KEY);
   } catch {
@@ -66,42 +39,27 @@ export function logout() {
   }
 }
 
-/** Returns the active session user (without password) or null. */
+/** The advisor of this tab, or null. */
 export function getActiveSession() {
   const session = readSession();
-  if (!session || typeof session.id !== 'string' || !Object.values(ROLES).includes(session.role)) return null;
-  return session;
+  return session?.user && session.token ? session.user : null;
 }
 
-/**
- * Checks the session user still exists (it may have been removed by a
- * restore/import in another tab). Refreshes the stored profile if it changed.
- */
+/** Refreshes the stored profile with the latest advisor list sent by the server. */
 export function revalidateSession() {
-  const session = getActiveSession();
-  if (!session) return null;
-  const user = getCollection('users').find((item) => item.id === session.id && item.role === session.role);
-  if (!user) {
+  const user = getActiveSession();
+  if (!user) return null;
+  const advisors = getAdvisors();
+  if (!advisors.length) return user;
+  const fresh = advisors.find((advisor) => advisor.id === user.id);
+  if (!fresh) {
     logout();
     return null;
   }
-  const fresh = toSessionUser(user);
-  writeSession(fresh);
+  writeSession({ ...readSession(), user: fresh });
   return fresh;
 }
 
 export function isStaff(user) {
-  return user?.role === ROLES.admin;
-}
-
-export function getUserById(id) {
-  const user = getCollection('users').find((item) => item.id === id);
-  return user ? toSessionUser(user) : null;
-}
-
-/** Every advisor, without passwords, sorted by name (for selects and joins). */
-export function getAdvisors() {
-  return getCollection('users')
-    .map(toSessionUser)
-    .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  return user?.role === 'admin';
 }

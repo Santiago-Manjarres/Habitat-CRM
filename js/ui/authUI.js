@@ -1,11 +1,10 @@
 /**
  * Login screen: show-hide password, demo autofill buttons, logout buttons and the
- * user chip. Also exports the shared form helpers (field errors, live validation,
+ * user chip. The username and password are checked by the Java server. Also exports the shared form helpers (field errors, live validation,
  * loading buttons) reused by the advisor panel.
  */
 import { ROLE_LABELS } from '../config.js';
 import { escapeHTML, iconMarkup } from '../utils/formatters.js';
-import { validateLoginForm } from '../utils/validators.js';
 import { login, logout } from '../services/authService.js';
 
 const DEMO_CREDENTIALS = {
@@ -13,7 +12,7 @@ const DEMO_CREDENTIALS = {
   andres: { username: 'andres', password: '1234' },
 };
 
-let callbacks = { onLogin: () => {}, onLogout: () => {}, whenReady: Promise.resolve() };
+let callbacks = { onLogin: () => {}, onLogout: () => {} };
 
 /* ==========================================================================
    Shared form helpers
@@ -44,11 +43,22 @@ export function clearFieldErrors(form) {
   showFieldErrors(form, {});
 }
 
-/** After the first failed submit, re-validate on every input. */
+/**
+ * After the first failed submit, check the form again while the advisor types.
+ * validate() asks the Java server and resolves to { field: message }; it runs
+ * 250 ms after the last key so the server is not called on every letter.
+ */
 export function enableLiveValidation(form, validate) {
   if (form.dataset.live === 'true') return;
   form.dataset.live = 'true';
-  form.addEventListener('input', () => showFieldErrors(form, validate()));
+  let timer = null;
+  form.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const errors = await validate();
+      if (form.isConnected) showFieldErrors(form, errors);
+    }, 250);
+  });
 }
 
 export function setButtonLoading(button, isLoading) {
@@ -106,17 +116,14 @@ async function handleLoginSubmit(event) {
   const submit = form.querySelector('[type="submit"]');
   const values = readForm(form);
   setFormAlert('login-error', '');
-  const check = validateLoginForm(values);
-  if (!check.valid) {
-    showFieldErrors(form, check.errors)?.focus();
-    enableLiveValidation(form, () => validateLoginForm(readForm(form)).errors);
-    return;
-  }
   clearFieldErrors(form);
   setButtonLoading(submit, true);
-  await callbacks.whenReady;
-  const result = login(values.username, values.password);
+  const result = await login(values.username, values.password);
   setButtonLoading(submit, false);
+  if (result.fieldErrors) {
+    showFieldErrors(form, result.fieldErrors)?.focus();
+    return;
+  }
   if (!result.ok) {
     setFormAlert('login-error', result.error);
     form.elements.password.select();
@@ -132,11 +139,13 @@ async function handleLoginSubmit(event) {
    ========================================================================== */
 
 /** Binds every login-screen and logout control once. */
-export function initAuthUI({ onLogin, onLogout, whenReady }) {
-  callbacks = { onLogin, onLogout, whenReady: whenReady ?? Promise.resolve() };
+export function initAuthUI({ onLogin, onLogout }) {
+  callbacks = { onLogin, onLogout };
   bindPasswordToggle();
   bindDemoButtons();
-  document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
+  const loginForm = document.getElementById('login-form');
+  loginForm.addEventListener('submit', handleLoginSubmit);
+  loginForm.addEventListener('input', (event) => { if (event.target.value) setFieldError(event.target, ''); });
   document.addEventListener('click', (event) => {
     if (!event.target.closest('[data-action="logout"]')) return;
     logout();

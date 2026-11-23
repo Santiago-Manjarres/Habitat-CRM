@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Proyecto NetBeans "Java with Ant". NetBeans crea nbproject/build-impl.xml al abrir el proyecto. -->
+<project name="HabitatCRM" default="default" basedir=".">
+    <description>Compila y ejecuta el servidor de Habitat CRM.</description>
+    <import file="nbproject/build-impl.xml"/>
+</project>

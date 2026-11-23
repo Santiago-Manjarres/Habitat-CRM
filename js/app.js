@@ -1,13 +1,13 @@
 /**
- * Habitat CRM — entry point.
- * Boots storage and sync, guards views by session/role, handles hash navigation
- * inside each view, mounts the role UI and forwards data changes (from this or
- * other tabs) so only the affected blocks re-render.
+ * Habitat CRM — entry point of the interface.
+ * Guards the views by session, handles hash navigation, asks the Java server for
+ * the data and redraws when it changes (in this tab or in another one).
  */
 import { APP_NAME, PLACEHOLDER_IMAGE } from './config.js';
-import { initStorage } from './services/storageService.js';
+import { setSessionExpiredHandler } from './services/api.js';
+import { loadState, clearState, getVersion } from './services/dataService.js';
 import { initSync, subscribe } from './services/syncService.js';
-import { getActiveSession, revalidateSession, isStaff } from './services/authService.js';
+import { getActiveSession, revalidateSession, isStaff, logout } from './services/authService.js';
 import { showToast, closeAllModals } from './ui/toastUI.js';
 import { initAuthUI, renderUserChips, resetLoginScreen } from './ui/authUI.js';
 import { mountAdminUI, refreshAdminUI, unmountAdminUI, renderAdminLoading } from './ui/adminUI.js';
@@ -22,7 +22,6 @@ const CONTROLLERS = {
   admin: { mount: mountAdminUI, refresh: refreshAdminUI, unmount: unmountAdminUI, loading: renderAdminLoading },
 };
 
-let dataReady = Promise.resolve();
 let currentView = null;
 let mounted = null; // { view, userId }
 
@@ -89,7 +88,10 @@ async function route({ moveFocus = false } = {}) {
     showView(expectedView);
     CONTROLLERS[expectedView].loading();
   }
-  await dataReady;
+  if (!getVersion() && !(await loadState())) {
+    if (getActiveSession()) showToast('No se pudo conectar con el servidor. Revisa que Habitat CRM esté encendido', { type: 'error' });
+    return;
+  }
   const user = revalidateSession();
   if (!user) {
     unmountViews();
@@ -113,6 +115,7 @@ function handleLogin(user) {
 function handleLogout({ message = 'Cerraste sesión', type = 'info' } = {}) {
   closeAllModals();
   unmountViews();
+  clearState();
   history.replaceState(null, '', window.location.pathname + window.location.search);
   renderUserChips(null);
   showView('login');
@@ -146,19 +149,19 @@ function handleImageError(event) {
 
 /* ---------- Boot ---------- */
 
-function loadData() {
-  return initStorage().catch((error) => {
-    console.error('[app] Storage initialization failed', error);
-    showToast(error.message || 'No se pudieron cargar los datos iniciales', { type: 'error' });
-  });
+/** The server forgot this session (it was restarted, for example): back to the login. */
+function handleSessionExpired() {
+  if (!getActiveSession()) return;
+  logout();
+  handleLogout({ message: 'Tu sesión terminó. Inicia sesión de nuevo', type: 'warning' });
 }
 
 function boot() {
   document.getElementById('boot-notice')?.remove();
   document.addEventListener('error', handleImageError, true);
-  initSync();
-  dataReady = loadData();
-  initAuthUI({ onLogin: handleLogin, onLogout: handleLogout, whenReady: dataReady });
+  setSessionExpiredHandler(handleSessionExpired);
+  initSync({ reload: loadState, version: getVersion });
+  initAuthUI({ onLogin: handleLogin, onLogout: handleLogout });
   subscribe(handleDataChange);
   window.addEventListener('hashchange', handleHashChange);
   route();
