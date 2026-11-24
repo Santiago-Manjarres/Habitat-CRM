@@ -1,60 +1,35 @@
 package servidor;
 
 import com.sun.net.httpserver.HttpServer;
-import datos.BaseDeDatos;
+import datos.EstructuraDeDatos;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
- * Punto de entrada de Habitat CRM.
- *
- * Arranca un servidor web en http://localhost:8080 que:
- *  - arma las páginas del CRM en Java (login, resumen, propiedades y clientes)
- *    con los datos de la base de datos simulada en data/*.json;
- *  - entrega los archivos del proyecto: la página de inicio, los CSS y las imágenes.
- *
- * Usa el servidor HTTP que ya viene con Java (com.sun.net.httpserver),
- * así que no necesita librerías externas.
+ * Punto de entrada: enciende el servidor web en http://localhost:8080
+ * Usa el servidor HTTP que ya trae Java, así que no necesita librerías.
  */
 public class Principal {
 
-    private static final int PUERTO = 8080;   // número de puerto por defecto (http://localhost:8080)
-
     public static void main(String[] args) throws IOException {
-        Path carpetaWeb = buscarCarpetaWeb(args);                      // 1. buscamos la carpeta con la página web
-        BaseDeDatos db = new BaseDeDatos(carpetaWeb.resolve("data"));  // 2. leemos los .json y los cargamos en memoria
-        int puerto = args.length > 1 ? Integer.parseInt(args[1]) : PUERTO;
+        // 1. La carpeta del proyecto (donde está index.html). NetBeans arranca dentro de servidor-java/, por eso se mira arriba.
+        Path carpeta = Files.exists(Path.of("index.html")) ? Path.of(".") : Path.of("..");
 
-        // 3. creamos el servidor y le decimos quién atiende cada tipo de dirección
-        HttpServer servidor = HttpServer.create(new InetSocketAddress(puerto), 0);
-        ManejadorPaginas paginas = new ManejadorPaginas(db);             // las páginas del CRM (las arma Java)
-        String[] rutasDelCrm = {"/entrar", "/salir", "/resumen", "/propiedades", "/clientes", "/app.html"};
-        for (String ruta : rutasDelCrm) {
-            servidor.createContext(ruta, paginas);
-        }
-        servidor.createContext("/", new ManejadorArchivos(carpetaWeb));   // todo lo demás -> archivos (CSS, imágenes, página de inicio)
-        servidor.start();                                              // 4. el servidor queda escuchando
+        // 2. Se leen los .json y quedan en memoria, en listas enlazadas
+        EstructuraDeDatos estructura = new EstructuraDeDatos(carpeta.resolve("data"));
 
-        System.out.println("Habitat CRM está funcionando.");
-        System.out.println("  Página:  http://localhost:" + puerto);
-        System.out.println("  Datos:   " + carpetaWeb.resolve("data").toAbsolutePath().normalize());
-        System.out.println("Para detenerlo, cierra esta ventana o presiona Ctrl + C.");
-    }
+        // 3. Se crea el servidor y se dice quién atiende cada dirección
+        HttpServer servidor = HttpServer.create(new InetSocketAddress(8080), 0);
+        Rutas rutas = new Rutas(estructura);
+        String[] paginasDelCrm = {"/entrar", "/salir", "/resumen", "/propiedades", "/clientes"};
+        for (String pagina : paginasDelCrm) {
+            servidor.createContext(pagina, rutas);                 // las páginas del CRM las arma Java
+        }
+        servidor.createContext("/", new Archivos(carpeta));       // lo demás: página de inicio, CSS, imágenes
+        servidor.start();
 
-    /**
-     * La carpeta web es la que contiene index.html. Si se ejecuta desde NetBeans,
-     * el programa arranca dentro de servidor-java/, así que se busca en la carpeta de arriba.
-     */
-    private static Path buscarCarpetaWeb(String[] args) {
-        if (args.length > 0) {
-            return Paths.get(args[0]);
-        }
-        if (Files.exists(Paths.get("index.html"))) {
-            return Paths.get(".");
-        }
-        return Paths.get("..");
+        System.out.println("Habitat CRM está funcionando en http://localhost:8080");
     }
 }

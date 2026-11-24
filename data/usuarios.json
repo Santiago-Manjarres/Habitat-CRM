@@ -1,0 +1,17 @@
+[
+  {
+    "usuario": "admin",
+    "clave": "admin",
+    "nombre": "Laura Mendoza"
+  },
+  {
+    "usuario": "andres",
+    "clave": "1234",
+    "nombre": "Andrés Rojas"
+  },
+  {
+    "usuario": "valentina",
+    "clave": "1234",
+    "nombre": "Valentina Ríos"
+  }
+]

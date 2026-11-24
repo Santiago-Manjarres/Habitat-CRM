@@ -1,0 +1,74 @@
+[
+  {
+    "id": "1",
+    "nombre": "Carlos Pérez",
+    "telefono": "+57 310 444 5566",
+    "correo": "carlos.perez@correo.com",
+    "propiedad": "1",
+    "etapa": "Contactado",
+    "notas": "Quiere financiar el 70% con crédito hipotecario."
+  },
+  {
+    "id": "2",
+    "nombre": "Ana Gómez",
+    "telefono": "+57 320 777 8899",
+    "correo": "ana.gomez@correo.com",
+    "propiedad": "5",
+    "etapa": "Visita",
+    "notas": "Visita agendada para el sábado a las 10:00 a. m."
+  },
+  {
+    "id": "3",
+    "nombre": "Jorge Castaño",
+    "telefono": "+57 315 210 9087",
+    "correo": "",
+    "propiedad": "4",
+    "etapa": "Nuevo",
+    "notas": ""
+  },
+  {
+    "id": "4",
+    "nombre": "Felipe Arango",
+    "telefono": "+57 318 640 1122",
+    "correo": "felipe.arango@correo.com",
+    "propiedad": "2",
+    "etapa": "Negociación",
+    "notas": "Ofertó $850 millones; pendiente respuesta del propietario."
+  },
+  {
+    "id": "5",
+    "nombre": "Mariana López",
+    "telefono": "+57 312 908 7766",
+    "correo": "mariana.lopez@correo.com",
+    "propiedad": "7",
+    "etapa": "Cerrado",
+    "notas": "Escrituración firmada en notaría."
+  },
+  {
+    "id": "6",
+    "nombre": "Carlos Pérez",
+    "telefono": "+57 310 444 5566",
+    "correo": "carlos.perez@correo.com",
+    "propiedad": "3",
+    "etapa": "Cerrado",
+    "notas": "Prefirió una opción más cerca de su trabajo."
+  },
+  {
+    "id": "7",
+    "nombre": "Sofía Herrera",
+    "telefono": "",
+    "correo": "sofia.herrera@correo.com",
+    "propiedad": "8",
+    "etapa": "Nuevo",
+    "notas": "Pregunta si admiten mascotas."
+  },
+  {
+    "id": "8",
+    "nombre": "Diego Martínez",
+    "telefono": "+57 311 555 0198",
+    "correo": "",
+    "propiedad": "6",
+    "etapa": "Contactado",
+    "notas": "Necesita la oficina desde enero."
+  }
+]

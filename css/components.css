@@ -1182,3 +1182,22 @@ textarea.field__control {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* --------------------------------------------------------------------------
+   Formulario en su propia página (crear y editar propiedades y clientes)
+   -------------------------------------------------------------------------- */
+.form-card {
+  display: grid;
+  gap: var(--space-5);
+  max-width: 640px;
+  padding: var(--space-5);
+}
+
+.form-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* En celular la tabla se vuelve tarjetas: la etiqueta de estado conserva su ancho */
+.data-table td > .badge { justify-self: start; }

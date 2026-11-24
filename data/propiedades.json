@@ -1,0 +1,92 @@
+[
+  {
+    "id": "1",
+    "titulo": "Apartamento Moderno con Vista al Mar",
+    "tipo": "Apartamento",
+    "operacion": "Venta",
+    "precio": "450000000",
+    "ubicacion": "Bocagrande, Cartagena",
+    "estado": "Disponible",
+    "foto": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "2",
+    "titulo": "Casa Campestre con Jardín y Chimenea",
+    "tipo": "Casa",
+    "operacion": "Venta",
+    "precio": "890000000",
+    "ubicacion": "Llanogrande, Rionegro",
+    "estado": "Disponible",
+    "foto": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "3",
+    "titulo": "Apartaestudio Amoblado en Chapinero Alto",
+    "tipo": "Apartamento",
+    "operacion": "Arriendo",
+    "precio": "2300000",
+    "ubicacion": "Chapinero Alto, Bogotá",
+    "estado": "Disponible",
+    "foto": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "4",
+    "titulo": "Local Comercial sobre Avenida Principal",
+    "tipo": "Local",
+    "operacion": "Arriendo",
+    "precio": "6500000",
+    "ubicacion": "El Poblado, Medellín",
+    "estado": "En negociación",
+    "foto": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "5",
+    "titulo": "Casa Familiar en Conjunto Cerrado",
+    "tipo": "Casa",
+    "operacion": "Venta",
+    "precio": "620000000",
+    "ubicacion": "Ciudad Jardín, Cali",
+    "estado": "En negociación",
+    "foto": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "6",
+    "titulo": "Oficina Ejecutiva en Torre Empresarial",
+    "tipo": "Oficina",
+    "operacion": "Arriendo",
+    "precio": "4800000",
+    "ubicacion": "Santa Bárbara, Bogotá",
+    "estado": "Disponible",
+    "foto": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "7",
+    "titulo": "Penthouse Dúplex con Terraza Privada",
+    "tipo": "Apartamento",
+    "operacion": "Venta",
+    "precio": "1350000000",
+    "ubicacion": "Rosales, Bogotá",
+    "estado": "Vendida",
+    "foto": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "8",
+    "titulo": "Apartamento para Estrenar cerca al Metro",
+    "tipo": "Apartamento",
+    "operacion": "Arriendo",
+    "precio": "1900000",
+    "ubicacion": "Envigado, Antioquia",
+    "estado": "Disponible",
+    "foto": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "9",
+    "titulo": "Local en el Centro Histórico",
+    "tipo": "Local",
+    "operacion": "Venta",
+    "precio": "380000000",
+    "ubicacion": "Centro Histórico, Cartagena",
+    "estado": "Disponible",
+    "foto": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80"
+  }
+]
