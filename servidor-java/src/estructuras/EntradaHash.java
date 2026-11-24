@@ -2,6 +2,7 @@ package estructuras;
 
 /**
  * Una pareja clave-valor guardada dentro de la tabla hash.
+ * Ejemplo: clave "prop_001" -> valor: la propiedad con ese id.
  */
 public class EntradaHash<T> {
 

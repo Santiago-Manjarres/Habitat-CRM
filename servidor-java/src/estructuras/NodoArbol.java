@@ -1,7 +1,13 @@
 package estructuras;
 
 /**
- * Nodo de un árbol binario de búsqueda: una clave, un valor y sus dos hijos.
+ * Nodo de un árbol binario de búsqueda.
+ * Guarda una clave (con la que se ordena), un valor y sus dos hijos:
+ *
+ *            [clave]
+ *            /     \
+ *     izquierdo   derecho
+ *   (claves menores) (claves mayores)
  */
 public class NodoArbol<T> {
 

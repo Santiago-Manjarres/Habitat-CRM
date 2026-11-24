@@ -15,14 +15,16 @@ import modelo.Registro;
  */
 public class Tabla<T extends Registro> {
 
-    private final ListaEnlazada<T> registros = new ListaEnlazada<>();
-    private final TablaHash<T> indicePorId = new TablaHash<>();
+    private final ListaEnlazada<T> registros = new ListaEnlazada<>();   // todos los registros, en orden
+    private final TablaHash<T> indicePorId = new TablaHash<>();         // índice para buscar por id rápido
 
+    /** Agrega un registro en las dos estructuras a la vez. */
     public void agregar(T registro) {
-        registros.agregar(registro);
-        indicePorId.poner(registro.getId(), registro);
+        registros.agregar(registro);                        // a la lista (mantiene el orden)
+        indicePorId.poner(registro.getId(), registro);      // a la tabla hash (para buscar por id)
     }
 
+    /** Busca un registro por su id usando la tabla hash (no recorre la lista). */
     public T buscarPorId(String id) {
         return indicePorId.obtener(id);
     }
@@ -33,12 +35,12 @@ public class Tabla<T extends Registro> {
 
     /** Elimina un registro de la lista y del índice. */
     public boolean eliminarPorId(String id) {
-        T registro = indicePorId.obtener(id);
+        T registro = indicePorId.obtener(id);   // 1. lo buscamos por id
         if (registro == null) {
-            return false;
+            return false;                       // no existe
         }
-        registros.eliminar(registro);
-        indicePorId.eliminar(id);
+        registros.eliminar(registro);           // 2. lo quitamos de la lista
+        indicePorId.eliminar(id);               // 3. lo quitamos del índice
         return true;
     }
 
@@ -46,6 +48,7 @@ public class Tabla<T extends Registro> {
         return registros;
     }
 
+    /** Primer nodo de la lista, para recorrer todos los registros con un while. */
     public Nodo<T> getPrimero() {
         return registros.getCabeza();
     }

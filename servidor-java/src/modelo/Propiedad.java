@@ -5,6 +5,9 @@ import servicios.Numeros;
 
 /**
  * Un inmueble del inventario. Se guarda en data/properties.json.
+ *
+ * Nota: las variables están en español, pero las claves del JSON ("title",
+ * "price", "location"...) siguen en inglés para no cambiar los archivos de datos.
  */
 public class Propiedad implements Registro {
 
@@ -12,15 +15,15 @@ public class Propiedad implements Registro {
     private String titulo;
     private String tipo;
     private String operacion;    // "sale" (venta) o "rent" (arriendo)
-    private double precio;
+    private double precio;      // precio en pesos
     private String moneda;
     private String ubicacion;
     private double area;
     private int habitaciones;
     private int banos;
     private int parqueaderos;
-    private String estado;       // "available", "negotiation" o "sold"
-    private String asesorId;
+    private String estado;       // "available" (disponible), "negotiation" (en negociación) o "sold" (vendida)
+    private String asesorId;     // id del asesor que la registró
     private String descripcion;
     private String imagenUrl;
     private String fechaCreacion;
@@ -89,20 +92,6 @@ public class Propiedad implements Registro {
                 .poner("createdAt", fechaCreacion);
     }
 
-    /** Resumen que acompaña a cada cliente en la interfaz. */
-    public ObjetoJson aJsonResumen() {
-        return new ObjetoJson()
-                .poner("id", id)
-                .poner("title", titulo)
-                .poner("location", ubicacion)
-                .poner("price", precio)
-                .poner("currency", moneda)
-                .poner("operation", operacion)
-                .poner("status", estado)
-                .poner("type", tipo)
-                .poner("imageUrl", imagenUrl);
-    }
-
     @Override
     public String getId() {
         return id;
@@ -134,5 +123,17 @@ public class Propiedad implements Registro {
 
     public String getFechaCreacion() {
         return fechaCreacion;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public String getMoneda() {
+        return moneda;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
     }
 }

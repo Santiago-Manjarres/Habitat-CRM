@@ -13,6 +13,7 @@ public class EscritorJson {
     private EscritorJson() {
     }
 
+    /** Convierte cualquier valor (texto, número, objeto, lista...) en texto JSON. */
     public static String escribir(Object valor, boolean bonito) {
         StringBuilder salida = new StringBuilder();
         escribirValor(valor, salida, bonito, 0);
@@ -20,6 +21,8 @@ public class EscritorJson {
     }
 
     @SuppressWarnings("unchecked")
+    // Revisa de qué tipo es el valor y usa la forma correcta de escribirlo.
+    // "nivel" cuenta cuántos objetos o listas hay dentro de otros (sirve para la sangría).
     private static void escribirValor(Object valor, StringBuilder salida, boolean bonito, int nivel) {
         if (valor == null) {
             salida.append("null");
@@ -47,14 +50,14 @@ public class EscritorJson {
         }
         salida.append('{');
         Nodo<EntradaHash<Object>> actual = objeto.getCampos().getCabeza();
-        while (actual != null) {
+        while (actual != null) {                                    // recorremos cada campo
             saltoDeLinea(salida, bonito, nivel + 1);
-            escribirTexto(actual.getDato().getClave(), salida);
-            salida.append(bonito ? ": " : ":");
-            escribirValor(actual.getDato().getValor(), salida, bonito, nivel + 1);
+            escribirTexto(actual.getDato().getClave(), salida);     // "clave"
+            salida.append(bonito ? ": " : ":");                     // :
+            escribirValor(actual.getDato().getValor(), salida, bonito, nivel + 1);  // valor
             actual = actual.getSiguiente();
             if (actual != null) {
-                salida.append(',');
+                salida.append(',');                                 // coma entre campos (no después del último)
             }
         }
         saltoDeLinea(salida, bonito, nivel);
@@ -80,6 +83,7 @@ public class EscritorJson {
         salida.append(']');
     }
 
+    /** En modo "bonito": pone un salto de línea y 2 espacios por cada nivel de profundidad. */
     private static void saltoDeLinea(StringBuilder salida, boolean bonito, int nivel) {
         if (!bonito) {
             return;
@@ -118,7 +122,7 @@ public class EscritorJson {
             return "null";
         }
         if (numero == Math.rint(numero) && Math.abs(numero) < 1e15) {
-            return String.valueOf((long) numero);
+            return String.valueOf((long) numero);   // es un entero: se escribe sin decimales
         }
         return String.valueOf(numero);
     }

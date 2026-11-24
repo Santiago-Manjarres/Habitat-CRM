@@ -9,14 +9,17 @@ import json.ObjetoJson;
  */
 public class Cliente implements Registro {
 
+    // Las variables están en español; las claves del JSON siguen en inglés ("contactName", "stage"...)
+
     private String id;
     private String nombre;
     private String telefono;
     private String correo;
-    private String origen;       // "web", "phone", "whatsapp", "walk_in" o "referral"
-    private String propiedadId;
-    private String asesorId;
-    private String etapa;        // "new", "contacted", "visit", "negotiation", "closed_won" o "closed_lost"
+    private String origen;       // cómo llegó: "web", "phone" (llamada), "whatsapp", "walk_in" (visita) o "referral" (recomendado)
+    private String propiedadId;  // id de la propiedad que le interesa
+    private String asesorId;     // id del asesor responsable
+    private String etapa;        // "new" (nuevo), "contacted" (contactado), "visit" (visita), "negotiation" (negociación),
+                             // "closed_won" (cerrado ganado) o "closed_lost" (cerrado perdido)
     private String notas;
     private String fechaCreacion;
     private String fechaActualizacion;
@@ -76,6 +79,22 @@ public class Cliente implements Registro {
 
     public String getNombre() {
         return nombre;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public String getOrigen() {
+        return origen;
+    }
+
+    public String getNotas() {
+        return notas;
     }
 
     public String getPropiedadId() {

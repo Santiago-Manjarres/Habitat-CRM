@@ -4,7 +4,9 @@ import java.net.URI;
 import json.ObjetoJson;
 
 /**
- * Revisa los datos de los formularios antes de guardarlos.
+ * Validador: revisa los datos de los formularios antes de guardarlos.
+ * Es la regla de oro del servidor: aunque el navegador ya revise, el servidor
+ * siempre vuelve a revisar, porque no se puede confiar en lo que llega de afuera.
  * Cada método devuelve un ObjetoJson con un mensaje por campo con error
  * (por ejemplo { "title": "El título es obligatorio" }). Si está vacío, todo está bien.
  */
@@ -13,6 +15,7 @@ public class Validador {
     private Validador() {
     }
 
+    /** El usuario y la contraseña no pueden venir vacíos. */
     public static ObjetoJson validarInicioSesion(String usuario, String contrasena) {
         ObjetoJson errores = new ObjetoJson();
         if (usuario.isEmpty()) errores.poner("username", "Escribe tu usuario");
@@ -60,6 +63,7 @@ public class Validador {
         }
     }
 
+    /** Revisa todos los campos de una propiedad (textos, opciones y números). */
     public static ObjetoJson validarPropiedad(ObjetoJson datos) {
         ObjetoJson errores = new ObjetoJson();
         revisarTextosPropiedad(datos, errores);

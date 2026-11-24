@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Habitat CRM — Base: fonts, reset, typography, focus, utilities, motion
+   Habitat CRM — Base: letras, reinicio de estilos, tipografía, foco,
+   utilidades y movimiento reducido
    ========================================================================== */
 
 @font-face {
@@ -10,7 +11,7 @@
   font-display: swap;
 }
 
-/* ---- Reset ---- */
+/* ---- Reinicio: quita los estilos que cada navegador trae por defecto ---- */
 *,
 *::before,
 *::after {
@@ -76,7 +77,7 @@ ol[role="list"] {
   display: none !important;
 }
 
-/* ---- Typography ---- */
+/* ---- Tipografía: tamaño y peso de títulos y textos ---- */
 h1,
 h2,
 h3,
@@ -89,7 +90,7 @@ h4 {
 
 h1 { font-size: var(--text-lg); }
 
-/* Page titles: semibold, tight tracking */
+/* Títulos de página: letra seminegrita y letras un poco juntas */
 h1,
 .display {
   font-family: var(--font-display);
@@ -114,7 +115,7 @@ p {
   h1 { font-size: var(--text-xl); }
 }
 
-/* ---- Focus: always visible for keyboard users ---- */
+/* ---- Foco: el recuadro azul se ve siempre para quien usa el teclado ---- */
 :focus {
   outline: none;
 }
@@ -129,7 +130,7 @@ p {
   color: var(--color-text);
 }
 
-/* ---- Utilities ---- */
+/* ---- Utilidades: clases pequeñas que se reutilizan ---- */
 .visually-hidden {
   position: absolute !important;
   width: 1px;
@@ -158,7 +159,7 @@ p {
   height: var(--icon-sm);
 }
 
-/* ---- Reduced motion: drop movement and scale, keep short fades ---- */
+/* ---- Movimiento reducido: si la persona lo pide, se quitan los movimientos y se dejan solo desvanecimientos cortos ---- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -168,14 +169,7 @@ p {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-
-  [data-motion="fade"] {
-    transition-property: opacity !important;
-    transition-duration: var(--duration-fast) !important;
-    transform: none !important;
-  }
-
-  /* No scale on press, no lift on hover */
+  /* Sin encogerse al presionar y sin subir al pasar el mouse */
   :active,
   :hover {
     transform: none !important;

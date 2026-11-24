@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Entrega los archivos de la página web: index.html, app.html, css, js,
+ * Entrega los archivos de la página web: index.html, css, js de la página de inicio,
  * imágenes y fuentes. Es lo que hace cualquier servidor web básico.
  */
 public class ManejadorArchivos implements HttpHandler {
@@ -24,13 +24,15 @@ public class ManejadorArchivos implements HttpHandler {
     public void handle(HttpExchange intercambio) throws IOException {
         String ruta = URLDecoder.decode(intercambio.getRequestURI().getPath(), StandardCharsets.UTF_8);
         if (ruta.equals("/")) {
-            ruta = "/index.html";
+            ruta = "/index.html";                       // la dirección raíz muestra la página de inicio
         }
+        // convertimos la dirección en un archivo real de la carpeta web
         Path archivo = carpetaWeb.resolve(ruta.substring(1)).normalize();
         if (!estaPermitido(archivo) || !Files.isRegularFile(archivo)) {
-            Respuesta.texto(intercambio, 404, "No encontrado");
+            Respuesta.texto(intercambio, 404, "No encontrado");   // no existe o no se puede ver
             return;
         }
+        // existe y está permitido: lo enviamos con su tipo de contenido
         Respuesta.archivo(intercambio, Files.readAllBytes(archivo), tipoDeContenido(archivo.toString()));
     }
 
@@ -40,13 +42,14 @@ public class ManejadorArchivos implements HttpHandler {
      */
     private boolean estaPermitido(Path archivo) {
         if (!archivo.startsWith(carpetaWeb)) {
-            return false;
+            return false;           // intentan salir de la carpeta web (por ejemplo con "../")
         }
         String relativa = carpetaWeb.relativize(archivo).toString().replace('\\', '/');
         return !relativa.startsWith("data/") && !relativa.startsWith("servidor-java/")
                 && !relativa.startsWith(".") && !relativa.contains("/.");
     }
 
+    /** Según la terminación del archivo, le dice al navegador qué tipo de archivo es. */
     private String tipoDeContenido(String nombre) {
         String n = nombre.toLowerCase();
         if (n.endsWith(".html")) return "text/html; charset=utf-8";

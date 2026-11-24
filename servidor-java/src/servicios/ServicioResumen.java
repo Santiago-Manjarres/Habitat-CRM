@@ -20,6 +20,7 @@ public class ServicioResumen {
 
     /** Los cuatro indicadores de arriba del resumen. */
     public ObjetoJson indicadores() {
+        // Primera pasada: recorremos las propiedades y contamos
         int disponibles = 0, enVenta = 0;
         double valorEnVenta = 0;
         for (Nodo<Propiedad> n = db.getPropiedades().getPrimero(); n != null; n = n.getSiguiente()) {
@@ -32,6 +33,7 @@ public class ServicioResumen {
                 }
             }
         }
+        // Segunda pasada: recorremos los clientes y contamos por etapa
         int activos = 0, nuevos = 0, ganados = 0, cerrados = 0;
         for (Nodo<Cliente> n = db.getClientes().getPrimero(); n != null; n = n.getSiguiente()) {
             String etapa = n.getDato().getEtapa();
@@ -48,12 +50,13 @@ public class ServicioResumen {
                 .poner("newLeads", nuevos)
                 .poner("wonDeals", ganados)
                 .poner("closedDeals", cerrados)
+                // porcentaje de éxito = cerrados ganados / total cerrados (null si todavía no hay cerrados)
                 .poner("winRate", cerrados == 0 ? null : (Object) Math.round(ganados * 100.0 / cerrados));
     }
 
     /** Cuántos clientes hay en cada columna del tablero (para el gráfico de barras). */
     public ListaEnlazada<Object> clientesPorEtapa() {
-        int[] conteo = new int[Catalogos.COLUMNAS.length];
+        int[] conteo = new int[Catalogos.COLUMNAS.length];    // un contador por cada columna
         for (Nodo<Cliente> n = db.getClientes().getPrimero(); n != null; n = n.getSiguiente()) {
             String columna = Catalogos.columnaDeEtapa(n.getDato().getEtapa());
             for (int i = 0; i < conteo.length; i++) {

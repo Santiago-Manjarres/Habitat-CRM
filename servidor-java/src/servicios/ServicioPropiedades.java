@@ -10,6 +10,9 @@ import modelo.Propiedad;
 
 /**
  * Inventario de propiedades: listar, buscar, crear, editar, cambiar estado y eliminar.
+ *
+ * Patrón que siguen crear, actualizar y eliminar:
+ *  1. validar los datos  ->  2. cambiar la tabla en memoria  ->  3. guardar el archivo .json
  */
 public class ServicioPropiedades {
 
@@ -36,14 +39,16 @@ public class ServicioPropiedades {
 
     /** Busca por título o ubicación, sin importar tildes ni mayúsculas. Todas las palabras deben aparecer. */
     public ListaEnlazada<Propiedad> buscar(String texto) {
+        // Separamos lo que escribió la persona en palabras: "casa bogota" -> ["casa", "bogota"]
         String[] palabras = Herramientas.normalizar(texto).split("\\s+");
         ListaEnlazada<Propiedad> resultado = new ListaEnlazada<>();
         for (Nodo<Propiedad> n = recientesPrimero().getCabeza(); n != null; n = n.getSiguiente()) {
+            // El texto donde se busca es el título y la ubicación juntos
             String dondeBuscar = Herramientas.normalizar(n.getDato().getTitulo() + " " + n.getDato().getUbicacion());
             boolean coinciden = true;
             for (String palabra : palabras) {
                 if (!dondeBuscar.contains(palabra)) {
-                    coinciden = false;
+                    coinciden = false;      // si falta una sola palabra, la propiedad no sirve
                 }
             }
             if (coinciden) {
@@ -64,30 +69,19 @@ public class ServicioPropiedades {
         return cantidad;
     }
 
-    /** JSON de una propiedad con el número de clientes interesados (para la interfaz). */
-    public ObjetoJson aJsonConClientes(Propiedad p) {
-        return p.aJson().poner("linkedLeads", contarClientes(p.getId()));
-    }
-
-    public ListaEnlazada<Object> aListaJson(ListaEnlazada<Propiedad> propiedades) {
-        ListaEnlazada<Object> lista = new ListaEnlazada<>();
-        for (Nodo<Propiedad> n = propiedades.getCabeza(); n != null; n = n.getSiguiente()) {
-            lista.agregar(aJsonConClientes(n.getDato()));
-        }
-        return lista;
-    }
-
+    /** Crea una propiedad nueva. */
     public ObjetoJson crear(ObjetoJson datos, String asesorId) {
-        ObjetoJson errores = Validador.validarPropiedad(datos);
+        ObjetoJson errores = Validador.validarPropiedad(datos);          // 1. validar
         if (errores.tamano() > 0) {
-            return Herramientas.conErrores(errores);
+            return Herramientas.conErrores(errores);                     //    hay errores: se devuelven y no se guarda nada
         }
         Propiedad nueva = Propiedad.nueva(Herramientas.nuevoId("prop"), datos, asesorId, Herramientas.fechaActual());
-        db.getPropiedades().agregar(nueva);
-        db.guardarPropiedades();
+        db.getPropiedades().agregar(nueva);                              // 2. agregar a la tabla en memoria
+        db.guardarPropiedades();                                         // 3. escribir properties.json
         return Herramientas.exito("property", nueva.aJson());
     }
 
+    /** Edita una propiedad que ya existe. */
     public ObjetoJson actualizar(String id, ObjetoJson datos) {
         Propiedad propiedad = db.getPropiedades().buscarPorId(id);
         if (propiedad == null) {
@@ -102,6 +96,7 @@ public class ServicioPropiedades {
         return Herramientas.exito("property", propiedad.aJson());
     }
 
+    /** Cambia solo el estado (disponible, en negociación o vendida). */
     public ObjetoJson cambiarEstado(String id, String estado) {
         if (!Herramientas.estaEn(estado, Catalogos.ESTADOS_PROPIEDAD)) {
             return Herramientas.fallo("Estado no válido");
@@ -120,12 +115,15 @@ public class ServicioPropiedades {
         if (!db.getPropiedades().existe(id)) {
             return Herramientas.fallo("La propiedad ya no existe");
         }
+        // 1. primero anotamos los ids de los clientes de esta propiedad
+        //    (no se borra mientras se recorre la lista, para no romper el recorrido)
         ListaEnlazada<String> idsClientes = new ListaEnlazada<>();
         for (Nodo<Cliente> n = db.getClientes().getPrimero(); n != null; n = n.getSiguiente()) {
             if (n.getDato().getPropiedadId().equals(id)) {
                 idsClientes.agregar(n.getDato().getId());
             }
         }
+        // 2. después eliminamos esos clientes uno por uno
         for (Nodo<String> n = idsClientes.getCabeza(); n != null; n = n.getSiguiente()) {
             db.getClientes().eliminarPorId(n.getDato());
         }

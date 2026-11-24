@@ -1,13 +1,20 @@
 package estructuras;
 
 /**
- * Nodo de una lista enlazada, una cola o una pila.
- * Guarda un dato y la referencia al nodo que sigue.
+ * Nodo: la "cajita" básica de una lista enlazada, una cola o una pila.
+ *
+ * Imagina un tren: cada vagón (nodo) lleva una carga (el dato) y está
+ * enganchado al vagón que sigue. El último vagón no tiene siguiente (null).
+ *
+ *   [dato | siguiente] -> [dato | siguiente] -> [dato | null]
+ *
+ * <T> significa que el nodo puede guardar cualquier tipo de dato
+ * (texto, propiedades, clientes, etc.).
  */
 public class Nodo<T> {
 
-    private T dato;
-    private Nodo<T> siguiente;
+    private T dato;               // lo que guarda el nodo
+    private Nodo<T> siguiente;    // el nodo que viene después (null si es el último)
 
     public Nodo(T dato) {
         this.dato = dato;

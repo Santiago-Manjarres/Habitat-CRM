@@ -1,13 +1,16 @@
 package servicios;
 
 /**
- * Valores permitidos en el CRM (los mismos que usa la interfaz).
+ * Catálogos: las listas de valores permitidos en el CRM (los mismos que usa la interfaz).
+ * Por ejemplo, un cliente solo puede estar en una de estas etapas. El Validador
+ * usa estas listas para rechazar valores inventados.
  */
 public class Catalogos {
 
     private Catalogos() {
     }
 
+    // Opciones de los formularios (algunos valores están en inglés porque así se guardan en los .json)
     public static final String[] TIPOS = {"Apartamento", "Casa", "Local", "Oficina", "Lote"};
     public static final String[] OPERACIONES = {"sale", "rent"};
     public static final String[] ESTADOS_PROPIEDAD = {"available", "negotiation", "sold"};

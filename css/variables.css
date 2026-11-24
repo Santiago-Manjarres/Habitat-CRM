@@ -1,69 +1,71 @@
 /* ==========================================================================
-   Habitat CRM — Design tokens (Spec §9.3)
-   The ONLY file allowed to declare literal colors, radii, shadows, durations.
-   Direction agreed with the product owner (reference: the Stripe dashboard):
-   - A white workspace, hairline borders instead of shadows, flat sections;
-     the Habitat logo blue (#2667CC) is the one accent (primary buttons,
-     active navigation, charts).
-   - Geist (OFL, self-hosted) for everything; base text 14px (fields 16px on mobile).
-   - Small controls (32px on desktop, 44px touch targets on phones), 6px radius
-     on controls, 8px on cards, light theme only.
+   Habitat CRM — Variables de diseño
+   Este es el ÚNICO archivo donde se escriben colores, bordes redondeados,
+   sombras y tiempos de animación. Los demás archivos los usan con var(--nombre).
+   Así, si quieres cambiar el azul de toda la página, lo cambias aquí una sola vez.
+
+   Idea de diseño (inspirada en el panel de Stripe):
+   - Fondo blanco, bordes finos en vez de sombras, secciones planas.
+   - El azul del logo (#2667CC) es el único color de acento: botones
+     principales, menú activo y gráficos.
+   - Una sola letra (Geist) en todo; texto base de 14px (campos de 16px en celular).
+   - Controles pequeños (32px en computador, 44px en celular para tocar con el dedo).
    ========================================================================== */
 
 :root {
-  /* Brand: a single accent (Habitat logo blue) */
+  /* Marca: un solo color de acento (el azul del logo de Habitat) */
   --color-accent: #2667cc;
   --color-accent-hover: #1f56ad;
-  --color-accent-soft: #eaf1fc;      /* soft backgrounds, selection, focus */
-  --color-on-accent: #ffffff;        /* text/icons on accent or danger fills */
+  --color-accent-soft: #eaf1fc;      /* fondos suaves, selección y foco */
+  --color-on-accent: #ffffff;        /* texto e íconos sobre fondos azules o rojos */
 
-  /* Neutrals */
-  --color-bg: #ffffff;               /* app background: one white workspace */
-  --color-surface: #ffffff;          /* cards, modals */
-  --color-surface-muted: #f6f8fa;    /* table headers, row hover, chart tracks */
+  /* Colores neutros (grises y blancos) */
+  --color-bg: #ffffff;               /* fondo de toda la aplicación: blanco */
+  --color-surface: #ffffff;          /* tarjetas y ventanas emergentes */
+  --color-surface-muted: #f6f8fa;    /* encabezados de tabla, fila al pasar el mouse, fondo de barras */
   --color-border: #e3e8ee;
-  --color-border-strong: #c9ced6;    /* form control borders (>= 3:1 not required for borders, aids clarity) */
-  --color-border-hover: #d5dbe1;     /* secondary buttons and a hovered card's border */
+  --color-border-strong: #c9ced6;    /* borde de los campos de formulario */
+  --color-border-hover: #d5dbe1;     /* borde de botones secundarios y de una tarjeta al pasar el mouse */
   --color-text: #1b1f27;
-  --color-text-muted: #5b6475;       /* >= 4.5:1 on --color-surface (5.96:1) */
-  --color-text-faint: #8a93a3;       /* 3.1:1 — decorative icons only, never body text */
-  --color-neutral: #4a5263;          /* neutral badge text (closed_lost) */
+  --color-text-muted: #5b6475;       /* texto secundario (contraste suficiente para leerse bien) */
+  --color-text-faint: #8a93a3;       /* solo para íconos decorativos, nunca para texto */
+  --color-neutral: #4a5263;          /* texto de la etiqueta gris (cliente perdido) */
   --color-neutral-bg: #eef0f3;
   --color-skeleton: #e9ecf0;
-  --color-chart-soft: #c9daf6;       /* chart bars that are not the highlight */
+  --color-chart-soft: #c9daf6;       /* barras del gráfico que no son la principal */
   --color-backdrop: rgba(16, 24, 40, 0.32);
 
-  /* Semantic (property and lead states) */
-  --color-success: #0e7a4b;  --color-success-bg: #e6f6ee;   /* Available, Closed won */
-  --color-warning: #9a5b00;  --color-warning-bg: #fff4dc;   /* Negotiation */
-  --color-danger:  #b42318;  --color-danger-bg:  #fdeceb;   /* Sold / errors */
+  /* Colores con significado (estados de propiedades y clientes) */
+  --color-success: #0e7a4b;  --color-success-bg: #e6f6ee;   /* Disponible, Cerrado ganado */
+  --color-warning: #9a5b00;  --color-warning-bg: #fff4dc;   /* En negociación */
+  --color-danger:  #b42318;  --color-danger-bg:  #fdeceb;   /* Vendida / errores */
   --color-danger-hover: #912018;
-  --color-info:    #1d5fd0;  --color-info-bg:    #e8f0fe;   /* New, Contacted */
+  --color-info:    #1d5fd0;  --color-info-bg:    #e8f0fe;   /* Nuevo, Contactado */
 
-  /* Typography */
+  /* Tipografía (letras) */
   --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --font-display: var(--font-sans);  /* titles and figures share the one family */
+  --font-display: var(--font-sans);  /* los títulos y las cifras usan la misma letra */
   --tracking-display: -0.025em;
   --text-xs: 12px;  --text-sm: 13px;  --text-base: 14px;
   --text-md: 16px;  --text-lg: 20px;  --text-xl: 24px;
-  --text-field-mobile: 16px;         /* form fields on mobile: prevents iOS zoom on focus (Spec §9.5) */
+  --text-field-mobile: 16px;         /* campos en celular: 16px evita que el iPhone haga zoom al escribir */
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-strong: 600;
-  --weight-figure: 600;              /* KPI values and figures */
+  --weight-figure: 600;              /* números grandes de los indicadores */
   --leading-body: 1.5;
   --leading-tight: 1.2;
   --tracking-tight: -0.01em;
 
-  /* Spacing (multiples of 4px) */
+  /* Espacios (siempre múltiplos de 4px) */
   --space-1: 4px;  --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
   --space-5: 24px; --space-6: 32px;  --space-7: 48px;
 
-  /* Control sizes */
-  --control-h: 44px;                 /* mobile-first: 44px touch target */
+  /* Tamaños de botones y campos */
+  --control-h: 44px;                 /* primero celular: 44px es un buen tamaño para tocar con el dedo */
   --control-h-desktop: 32px;
-  --control-h-sm: 28px;              /* buttons inside tables */
+  --control-h-sm: 28px;              /* botones dentro de las tablas */
   --field-h: 44px;
   --field-h-desktop: 36px;
   --icon-sm: 16px;
@@ -71,19 +73,19 @@
   --dot-size: 6px;
   --bottom-nav-h: 56px;
 
-  /* Radii */
+  /* Bordes redondeados */
   --radius-none: 0;
-  --radius-xs: 4px;   /* badges */
-  --radius-sm: 6px;   /* buttons, inputs, small tiles */
-  --radius-md: 8px;   /* cards, tables, kanban columns */
-  --radius-lg: 12px;  /* modals */
+  --radius-xs: 4px;   /* etiquetas de estado */
+  --radius-sm: 6px;   /* botones, campos y cuadritos pequeños */
+  --radius-md: 8px;   /* tarjetas, tablas y columnas del tablero */
+  --radius-lg: 12px;  /* ventanas emergentes */
   --radius-full: 999px;
 
-  /* Shadows (the "border" is a 1px shadow) */
+  /* Sombras (el "borde" es una sombra de 1px) */
   --shadow-border: 0 0 0 1px var(--color-border);
   --shadow-field: 0 0 0 1px var(--color-border-strong);
   --shadow-field-error: 0 0 0 1px var(--color-danger);
-  --shadow-sm: 0 0 0 1px var(--color-border);   /* flat card: a hairline, no drop shadow */
+  --shadow-sm: 0 0 0 1px var(--color-border);   /* tarjeta plana: solo una línea fina, sin sombra */
   --shadow-button: 0 1px 1px rgba(16, 24, 40, .06), 0 0 0 1px var(--color-border-hover);
   --shadow-button-primary: 0 1px 1px rgba(16, 24, 40, .12), inset 0 -1px 0 rgba(16, 24, 40, .16);
   --shadow-md: 0 8px 24px rgba(16, 24, 40, .06), 0 0 0 1px var(--color-border);
@@ -94,22 +96,22 @@
   --shadow-divider-bottom: 0 1px 0 var(--color-border);
   --shadow-divider-top: 0 -1px 0 var(--color-border);
   --shadow-divider-right: 1px 0 0 var(--color-border);
-  --shadow-hover: 0 8px 24px rgba(16, 24, 40, .08), 0 0 0 1px var(--color-border-hover); /* linked card on hover only */
+  --shadow-hover: 0 8px 24px rgba(16, 24, 40, .08), 0 0 0 1px var(--color-border-hover); /* tarjeta con enlace, solo al pasar el mouse */
 
-  /* Motion */
+  /* Movimiento (duración de las animaciones) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --duration-press: 120ms;   /* press feedback */
-  --duration-fast: 160ms;    /* hover, tooltips, chat-like inserts */
-  --duration-base: 220ms;    /* menus, dropdowns */
-  --duration-modal: 280ms;   /* modals and panels */
-  --duration-photo: 280ms;   /* a photograph zooming 1.03 inside its frame (kept under the 300ms cap) */
-  --duration-exit: 180ms;    /* exits are faster than entries */
-  --duration-spin: 700ms;    /* continuous spinner rotation (linear) */
-  --duration-pulse: 1400ms;  /* continuous skeleton pulse */
-  --stagger-step: 40ms;      /* first catalog load: delay between cards (max 8) */
-  --delay-boot-notice: 1200ms; /* boot notice only appears if the app failed to start */
+  --duration-press: 120ms;   /* al presionar un botón */
+  --duration-fast: 160ms;    /* al pasar el mouse y mensajes pequeños */
+  --duration-base: 220ms;    /* menús desplegables */
+  --duration-modal: 280ms;   /* ventanas emergentes y paneles */
+  --duration-photo: 280ms;   /* una foto que se agranda un poco dentro de su marco */
+  --duration-exit: 180ms;    /* al salir, la animación es más rápida que al entrar */
+  --duration-spin: 700ms;    /* giro continuo del círculo de carga */
+  --duration-pulse: 1400ms;  /* pulso continuo de los bloques grises de carga */
+  --stagger-step: 40ms;      /* al cargar las tarjetas: pausa entre una y otra (máximo 8) */
+  --duration-aviso: 4000ms;  /* cuánto dura en pantalla un aviso ("Propiedad creada") */
 
-  /* Layers */
+  /* Capas (qué elemento queda encima de cuál) */
   --z-nav: 100;  --z-modal: 1000;  --z-toast: 1100;
 }

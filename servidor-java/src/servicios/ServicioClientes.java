@@ -7,11 +7,12 @@ import estructuras.ListaEnlazada;
 import estructuras.Nodo;
 import json.ObjetoJson;
 import modelo.Cliente;
-import modelo.Propiedad;
-import modelo.Usuario;
 
 /**
  * Clientes interesados: crear, editar, cambiar de etapa, eliminar y armar el tablero.
+ *
+ * Aquí se usan casi todas las estructuras: árbol (ordenar por fecha), pila
+ * (invertir el orden), cola (clientes por contactar) y arreglo de listas (tablero).
  */
 public class ServicioClientes {
 
@@ -19,27 +20,6 @@ public class ServicioClientes {
 
     public ServicioClientes(BaseDeDatos db) {
         this.db = db;
-    }
-
-    /** Cliente con su asesor y un resumen de la propiedad, listo para mostrarlo. */
-    public ObjetoJson conDetalles(Cliente c) {
-        Usuario asesor = db.getUsuarios().buscarPorId(c.getAsesorId());
-        Propiedad propiedad = db.getPropiedades().buscarPorId(c.getPropiedadId());
-        ObjetoJson json = c.aJson();
-        json.poner("agent", asesor == null ? null : new ObjetoJson()
-                .poner("id", asesor.getId())
-                .poner("name", asesor.getNombre())
-                .poner("avatar", asesor.getAvatar()));
-        json.poner("property", propiedad == null ? null : propiedad.aJsonResumen());
-        return json;
-    }
-
-    public ListaEnlazada<Object> aListaJson(ListaEnlazada<Cliente> clientes) {
-        ListaEnlazada<Object> lista = new ListaEnlazada<>();
-        for (Nodo<Cliente> n = clientes.getCabeza(); n != null; n = n.getSiguiente()) {
-            lista.agregar(conDetalles(n.getDato()));
-        }
-        return lista;
     }
 
     /**
@@ -50,8 +30,10 @@ public class ServicioClientes {
         ArbolBinarioBusqueda<Cliente> arbol = new ArbolBinarioBusqueda<>();
         for (Nodo<Cliente> n = db.getClientes().getPrimero(); n != null; n = n.getSiguiente()) {
             Cliente c = n.getDato();
+            // clave = fecha + id (el id evita que dos clientes con la misma fecha se pisen)
             arbol.insertar(c.getFechaActualizacion() + c.getId(), c);
         }
+        // el árbol los entrega del más antiguo al más nuevo; la pila los invierte
         return Herramientas.invertir(arbol.recorrerEnOrden());
     }
 
@@ -59,6 +41,7 @@ public class ServicioClientes {
     public ListaEnlazada<Cliente> ultimosMovimientos(int cantidad) {
         ListaEnlazada<Cliente> resultado = new ListaEnlazada<>();
         Nodo<Cliente> n = recientesPrimero().getCabeza();
+        // nos detenemos cuando ya juntamos la cantidad pedida
         while (n != null && resultado.tamano() < cantidad) {
             resultado.agregar(n.getDato());
             n = n.getSiguiente();
@@ -74,10 +57,11 @@ public class ServicioClientes {
         ArbolBinarioBusqueda<Cliente> arbol = new ArbolBinarioBusqueda<>();
         for (Nodo<Cliente> n = db.getClientes().getPrimero(); n != null; n = n.getSiguiente()) {
             Cliente c = n.getDato();
-            if (c.getEtapa().equals("new")) {
-                arbol.insertar(c.getFechaCreacion() + c.getId(), c);
+            if (c.getEtapa().equals("new")) {       // solo los clientes en etapa "nuevo"
+                arbol.insertar(c.getFechaCreacion() + c.getId(), c);   // ordenados por fecha de creación
             }
         }
+        // Pasamos del más antiguo al más nuevo a la cola: el más antiguo queda al frente
         Cola<Cliente> cola = new Cola<>();
         for (Nodo<Cliente> n = arbol.recorrerEnOrden().getCabeza(); n != null; n = n.getSiguiente()) {
             cola.encolar(n.getDato());
@@ -88,29 +72,31 @@ public class ServicioClientes {
     /**
      * Tablero de clientes: un arreglo con una lista enlazada por columna
      * (Nuevo, Contactado, Visita, Negociación, Cerrado).
+     * La columna "Nuevo" se llena desde la cola de clientes por contactar:
+     * el primero de la columna es el que lleva más tiempo esperando una llamada.
      */
     @SuppressWarnings("unchecked")
-    public ListaEnlazada<Object> tablero() {
+    public ListaEnlazada<Cliente>[] columnas() {
+        // 1. un arreglo con 5 posiciones; cada posición guarda la lista de clientes de esa columna
         ListaEnlazada<Cliente>[] columnas = new ListaEnlazada[Catalogos.COLUMNAS.length];
         for (int i = 0; i < columnas.length; i++) {
             columnas[i] = new ListaEnlazada<>();
         }
+        // 2. columna 0 (Nuevo): sacamos los clientes de la cola, del que llegó primero al último
+        Cola<Cliente> cola = porContactar();
+        while (!cola.estaVacia()) {
+            columnas[0].agregar(cola.desencolar());
+        }
+        // 3. las demás columnas: repartimos cada cliente (del más reciente al más antiguo) en la suya
         for (Nodo<Cliente> n = recientesPrimero().getCabeza(); n != null; n = n.getSiguiente()) {
             String columna = Catalogos.columnaDeEtapa(n.getDato().getEtapa());
-            for (int i = 0; i < columnas.length; i++) {
+            for (int i = 1; i < columnas.length; i++) {
                 if (Catalogos.COLUMNAS[i].equals(columna)) {
                     columnas[i].agregar(n.getDato());
                 }
             }
         }
-        ListaEnlazada<Object> resultado = new ListaEnlazada<>();
-        for (int i = 0; i < columnas.length; i++) {
-            resultado.agregar(new ObjetoJson()
-                    .poner("key", Catalogos.COLUMNAS[i])
-                    .poner("label", Catalogos.NOMBRES_COLUMNAS[i])
-                    .poner("leads", aListaJson(columnas[i])));
-        }
-        return resultado;
+        return columnas;
     }
 
     /** Valida el formulario y revisa que la propiedad y el asesor existan. */
@@ -127,6 +113,7 @@ public class ServicioClientes {
         return errores;
     }
 
+    /** Crea un cliente nuevo: validar, agregar a la tabla y guardar leads.json. */
     public ObjetoJson crear(ObjetoJson datos) {
         ObjetoJson errores = revisar(datos);
         if (errores.tamano() > 0) {
@@ -138,6 +125,7 @@ public class ServicioClientes {
         return Herramientas.exito("lead", nuevo.aJson());
     }
 
+    /** Edita un cliente y actualiza su fecha de último cambio. */
     public ObjetoJson actualizar(String id, ObjetoJson datos) {
         Cliente cliente = db.getClientes().buscarPorId(id);
         if (cliente == null) {
@@ -153,6 +141,7 @@ public class ServicioClientes {
         return Herramientas.exito("lead", cliente.aJson());
     }
 
+    /** Mueve al cliente a otra etapa del embudo. */
     public ObjetoJson cambiarEtapa(String id, String etapa) {
         if (!Herramientas.estaEn(etapa, Catalogos.ETAPAS)) {
             return Herramientas.fallo("Etapa no válida");
@@ -167,6 +156,7 @@ public class ServicioClientes {
         return Herramientas.exito("lead", cliente.aJson());
     }
 
+    /** Elimina un cliente de la tabla y guarda el archivo. */
     public ObjetoJson eliminar(String id) {
         if (!db.getClientes().eliminarPorId(id)) {
             return Herramientas.fallo("Este cliente ya no existe");

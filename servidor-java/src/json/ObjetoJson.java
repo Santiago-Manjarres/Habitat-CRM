@@ -14,8 +14,10 @@ import estructuras.Nodo;
  */
 public class ObjetoJson {
 
+    // Los campos viven en una lista de parejas clave-valor (en el orden en que se agregaron)
     private final ListaEnlazada<EntradaHash<Object>> campos = new ListaEnlazada<>();
 
+    /** Recorre la lista de campos buscando una clave. Devuelve null si no existe. */
     private EntradaHash<Object> buscar(String clave) {
         Nodo<EntradaHash<Object>> actual = campos.getCabeza();
         while (actual != null) {
@@ -31,18 +33,20 @@ public class ObjetoJson {
     public ObjetoJson poner(String clave, Object valor) {
         EntradaHash<Object> existente = buscar(clave);
         if (existente != null) {
-            existente.setValor(valor);
+            existente.setValor(valor);                          // ya existía: cambiamos el valor
         } else {
-            campos.agregar(new EntradaHash<>(clave, valor));
+            campos.agregar(new EntradaHash<>(clave, valor));    // no existía: lo agregamos al final
         }
-        return this;
+        return this;                                            // devolver "this" permite encadenar: .poner(...).poner(...)
     }
 
+    /** Devuelve el valor de un campo (o null si no existe). */
     public Object obtener(String clave) {
         EntradaHash<Object> entrada = buscar(clave);
         return entrada == null ? null : entrada.getValor();
     }
 
+    /** Dice si el objeto tiene ese campo. */
     public boolean tiene(String clave) {
         return buscar(clave) != null;
     }
@@ -62,9 +66,11 @@ public class ObjetoJson {
     /** Lee un campo numérico. Si no es un número, devuelve NaN. */
     public double numero(String clave) {
         Object valor = obtener(clave);
-        return valor instanceof Double ? (Double) valor : Double.NaN;
+        // Number incluye Double, Integer y Long (los tres tipos de número que guardamos)
+        return valor instanceof Number ? ((Number) valor).doubleValue() : Double.NaN;
     }
 
+    /** Devuelve la lista de campos, para recorrerlos (lo usa EscritorJson). */
     public ListaEnlazada<EntradaHash<Object>> getCampos() {
         return campos;
     }

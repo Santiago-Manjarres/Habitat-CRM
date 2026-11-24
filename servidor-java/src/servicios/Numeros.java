@@ -17,6 +17,8 @@ public class Numeros {
         if (valor == null) {
             return Double.NaN;
         }
+        // Dejamos solo dígitos y el signo menos; la coma decimal se cambia por punto
+        // (que es lo que entiende Java). Los puntos de miles y los símbolos ($, espacios) se descartan.
         StringBuilder limpio = new StringBuilder();
         String texto = valor.toString().trim();
         for (int i = 0; i < texto.length(); i++) {

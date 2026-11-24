@@ -1,9 +1,11 @@
 /* ==========================================================================
-   Habitat CRM — landing page CSS (index.html)
-   The page runs on the taste-skill kit (assets/system.css and friends). This file
-   holds only what the kit lacks: the self-hosted font and the inside of each
-   visual (the CRM drawn as live HTML). Colours come from the kit's tokens
-   (--p-*, --u-*), so the dark band recolours the app frame by itself.
+   Habitat CRM — estilos de la página de inicio (index.html)
+   La página es solo HTML y CSS: no usa JavaScript.
+   La página usa un conjunto de estilos base (assets/system.css y archivos
+   similares). Este archivo solo agrega lo que ese conjunto no tiene: la letra
+   Geist y el interior de cada dibujo (el CRM dibujado con HTML).
+   Los colores salen de las variables del conjunto base (--p-*, --u-*), por eso
+   la franja oscura cambia sola el color de la ventana de ejemplo.
    ========================================================================== */
 
 @font-face {
@@ -15,15 +17,15 @@
 }
 
 .brand-logo { width: 28px; height: 26px; object-fit: contain; }
-/* at 320 the bar holds the logo, the main button and the menu: the name steps aside, the logo keeps its label */
+/* con 320px de ancho la barra solo tiene espacio para el logo y el botón principal: el nombre se oculta */
 @media (max-width: 359px) { .nav .brand-name { display: none; } }
-/* Geist's ascenders are taller than the kit's .86 line: give the closing word room at its top */
+/* Las letras altas de Geist necesitan más espacio: se deja aire arriba de la palabra final */
 .close__word { line-height: 1.02; flex-shrink: 0; }
-/* on a short window the closing keeps its full height instead of squeezing the name over the links */
+/* en una ventana baja el cierre mantiene su altura para que el nombre no se monte sobre los enlaces */
 footer.closing { height: auto; min-height: 100vh; min-height: 100svh; }
 footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; row-gap: var(--s-7); }
 
-/* Status chips shared by every visual (the CRM's own states) */
+/* Etiquetas de estado que comparten todos los dibujos (son los estados del CRM) */
 .st {
   display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
   padding: 2px 10px; border-radius: 999px;
@@ -36,7 +38,7 @@ footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; row-gap: var(-
 .st--info { color: #1d5fd0; background: #e8f0fe; }
 .st--off { color: #4a5263; background: #eef0f3; }
 
-/* ---------------------------------------------------------------- hero window: the leads view */
+/* ---------------------------------------------------------------- ventana principal: la vista de clientes */
 .hero--centred .hero__window { background: linear-gradient(180deg, #e9f0fb, #f5f6fa 70%); }
 .hw {
   overflow: hidden; border-radius: 16px; background: #fff; color: var(--p-ink);
@@ -81,7 +83,7 @@ footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; row-gap: var(-
   .hw__stages li:nth-child(n + 4) { display: none; }
 }
 
-/* ---------------------------------------------------------------- app-frame (sections-library.md, app-frame) */
+/* ---------------------------------------------------------------- ventana de ejemplo del CRM (app-frame) */
 .app.ui { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); margin-top: var(--s-7); background: var(--u-bg); border: 1px solid var(--u-border); border-radius: var(--u-r); box-shadow: var(--u-shadow); }
 .app > .app__pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
 .app > .app__pane + .app__pane { border-left: 1px solid var(--u-line); }
@@ -120,7 +122,7 @@ footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; row-gap: var(-
 .af-lead { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; padding: 12px; border-radius: 12px; border: 1px solid var(--u-line); }
 .af-lead i { grid-row: auto; }
 
-/* ---------------------------------------------------------------- bento and step panels: small pieces of the CRM */
+/* ---------------------------------------------------------------- paneles de funciones y de pasos: piezas pequeñas del CRM */
 #funciones .panel { --p-h: 260px; }
 #como-funciona .panel { --p-h: 196px; }
 @media (max-width: 639px) { #funciones .panel { --p-h: 132px; } #como-funciona .panel { --p-h: 222px; } }
@@ -151,27 +153,19 @@ footer.closing > .wrap { grid-template-rows: minmax(0, 1fr) auto; row-gap: var(-
 .bx-stage { display: flex; align-items: center; gap: 12px; padding-top: 24px; }
 .bx-arrow { color: var(--p-ink); }
 
-/* the marquee closes the steps section as its last row (moments.md); minmax keeps its rail from widening the page */
+/* la franja de etiquetas cierra la sección de pasos; minmax evita que ensanche la página */
 .mq { margin-top: var(--s-8); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); overflow: hidden; }
-/* on a phone the three steps and the marquee need exactly two screens */
+/* en celular los tres pasos y la franja ocupan exactamente dos pantallas */
 @media (max-width: 639px) { #como-funciona { --hm: 2; } }
+.mq__list { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: 0; padding: 0; list-style: none; }
+.mq__list li { padding: 8px 16px; border-radius: 999px; background: var(--p-surface); color: var(--p-ink); font-weight: 500; }
 
-/* ---------------------------------------------------------------- portraits inside the drawn UI */
+/* ---------------------------------------------------------------- retratos dentro del dibujo de la interfaz */
 .hw__me { display: inline-flex; align-items: center; gap: 8px; }
 .hw__face, .bx-face { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .bx-tabs small { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 
-/* ---------------------------------------------------------------- the app frame is a working selector */
-button.af-row {
-  width: 100%; border: 0; margin: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
-  transition: background-color 160ms cubic-bezier(.23, 1, .32, 1), transform 120ms cubic-bezier(.23, 1, .32, 1);
-}
-button.af-row:active { transform: scale(.985); }
-button.af-row:focus-visible { outline: 2px solid var(--p-accent); outline-offset: -2px; }
-@media (hover: hover) and (pointer: fine) { button.af-row:not(.is-on):hover { background: color-mix(in srgb, var(--u-fill) 60%, transparent); } }
-.af-open { will-change: opacity, transform; }
-
-/* ---------------------------------------------------------------- inventory: text and listing left, the liquid photograph right */
+/* ---------------------------------------------------------------- inventario: texto y lista a la izquierda, foto a la derecha */
 .inv { align-items: stretch; }
 .inv__text { display: grid; grid-template-rows: auto auto 1fr; align-content: start; gap: var(--s-5); }
 .inv__text > .inv__list { align-self: end; }
@@ -195,6 +189,16 @@ button.af-row:focus-visible { outline: 2px solid var(--p-accent); outline-offset
   .inv__lead { min-height: 0; aspect-ratio: 4 / 3; }
   .inv__row .st { display: none; }
 }
-/* grid items never widen past their track: long names end in an ellipsis instead of running over the chips */
+/* los elementos de la cuadrícula no se salen de su columna: los nombres largos terminan en "..." en vez de montarse sobre las etiquetas */
 .af-row > span, .af-lead > span { min-width: 0; }
-@media (prefers-reduced-motion: reduce) { .inv__row, button.af-row { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .inv__row { transition: none; } }
+
+/* ---------------------------------------------------------------- menú en celular, sin botón de menú
+   El menú desplegable necesitaba JavaScript. Ahora las palabras se quedan en la barra
+   (se desliza hacia un lado si no caben) y el botón "Entrar al CRM" siempre se ve. */
+@media (max-width: 1023px) {
+  .nav__links { display: flex; overflow-x: auto; scrollbar-width: none; margin-right: var(--s-3); padding-right: var(--s-2); border-right: 1px solid var(--line); }
+  .nav__actions { display: flex; margin-left: auto; }
+}
+/* en un celular las palabras no caben junto al logo y al botón: quedan en las columnas del pie de página */
+@media (max-width: 639px) { .nav__links { display: none; } }

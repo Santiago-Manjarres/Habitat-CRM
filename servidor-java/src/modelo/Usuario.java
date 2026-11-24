@@ -5,6 +5,10 @@ import json.ObjetoJson;
 /**
  * Un asesor de la inmobiliaria (el único tipo de usuario del CRM).
  * Se guarda en data/users.json.
+ *
+ * Nota: las variables están en español, pero las claves del JSON ("username",
+ * "name", "email"...) siguen en inglés para no cambiar los archivos de datos
+ * ni la interfaz que ya las usa.
  */
 public class Usuario implements Registro {
 
@@ -37,7 +41,7 @@ public class Usuario implements Registro {
         return aJsonPublico().poner("password", contrasena);
     }
 
-    /** JSON sin la contraseña: lo que se le envía al navegador. */
+    /** JSON sin la contraseña (por ejemplo, para mostrar sus datos sin exponer la clave). */
     public ObjetoJson aJsonPublico() {
         return new ObjetoJson()
                 .poner("id", id)

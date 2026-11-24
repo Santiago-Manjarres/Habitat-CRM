@@ -15,8 +15,8 @@ import estructuras.ListaEnlazada;
  */
 public class LectorJson {
 
-    private final String texto;
-    private int posicion;
+    private final String texto;   // el JSON completo que se está leyendo
+    private int posicion;         // en qué carácter vamos (como un dedo que recorre el texto)
 
     private LectorJson(String texto) {
         this.texto = texto;
@@ -26,7 +26,7 @@ public class LectorJson {
     /** Punto de entrada: lee un texto JSON completo. */
     public static Object leer(String texto) {
         LectorJson lector = new LectorJson(texto);
-        Object valor = lector.leerValor();
+        Object valor = lector.leerValor();      // leemos el valor principal (un objeto o un arreglo)
         lector.saltarEspacios();
         if (lector.posicion < texto.length()) {
             throw lector.error("Hay texto de más al final");
@@ -34,6 +34,7 @@ public class LectorJson {
         return valor;
     }
 
+    /** Mira el primer carácter para saber qué tipo de valor viene y llama a la función correcta. */
     private Object leerValor() {
         saltarEspacios();
         if (posicion >= texto.length()) {
@@ -49,6 +50,7 @@ public class LectorJson {
         return leerNumero();
     }
 
+    /** Lee un objeto: { "clave": valor, "clave2": valor2 } */
     private ObjetoJson leerObjeto() {
         ObjetoJson objeto = new ObjetoJson();
         posicion++; // salta {
@@ -56,16 +58,17 @@ public class LectorJson {
         if (siguienteEs('}')) return objeto;
         while (true) {
             saltarEspacios();
-            String clave = leerTexto();
+            String clave = leerTexto();         // 1. la clave va entre comillas
             saltarEspacios();
-            esperar(':');
-            objeto.poner(clave, leerValor());
+            esperar(':');                       // 2. luego van los dos puntos
+            objeto.poner(clave, leerValor());   // 3. y después el valor (puede ser otro objeto: por eso es recursivo)
             saltarEspacios();
-            if (siguienteEs('}')) return objeto;
-            esperar(',');
+            if (siguienteEs('}')) return objeto;    // 4. si viene } se acabó el objeto
+            esperar(',');                           //    si no, tiene que venir una coma
         }
     }
 
+    /** Lee un arreglo: [ valor, valor, valor ]. Lo guarda en una lista enlazada. */
     private ListaEnlazada<Object> leerArreglo() {
         ListaEnlazada<Object> lista = new ListaEnlazada<>();
         posicion++; // salta [
@@ -79,6 +82,7 @@ public class LectorJson {
         }
     }
 
+    /** Lee un texto entre comillas, letra por letra, hasta la comilla que lo cierra. */
     private String leerTexto() {
         esperar('"');
         StringBuilder resultado = new StringBuilder();
@@ -96,7 +100,7 @@ public class LectorJson {
         throw error("Falta cerrar un texto con comillas");
     }
 
-    /** Traduce las secuencias de escape: \n, \t, \", \\, á, etc. */
+    /** Traduce las secuencias de escape: \n (salto de línea), \t (tabulación), \" (comilla), u más 4 dígitos (letras con tilde), etc. */
     private char leerEscape() {
         char c = texto.charAt(posicion++);
         switch (c) {
@@ -113,6 +117,7 @@ public class LectorJson {
         }
     }
 
+    /** Lee un número: junta los caracteres que pueden formar parte de un número y los convierte. */
     private Double leerNumero() {
         int inicio = posicion;
         while (posicion < texto.length() && "+-0123456789.eE".indexOf(texto.charAt(posicion)) >= 0) {
@@ -124,6 +129,7 @@ public class LectorJson {
         return Double.parseDouble(texto.substring(inicio, posicion));
     }
 
+    /** Avanza el dedo sobre los espacios y saltos de línea, que no importan en JSON. */
     private void saltarEspacios() {
         while (posicion < texto.length() && Character.isWhitespace(texto.charAt(posicion))) {
             posicion++;
@@ -139,12 +145,14 @@ public class LectorJson {
         return false;
     }
 
+    /** Exige que el siguiente carácter sea c; si no lo es, lanza un error. */
     private void esperar(char c) {
         if (!siguienteEs(c)) {
             throw error("Se esperaba '" + c + "'");
         }
     }
 
+    /** Crea un error que dice en qué posición del texto falló la lectura. */
     private IllegalArgumentException error(String mensaje) {
         return new IllegalArgumentException("JSON no válido en la posición " + posicion + ": " + mensaje);
     }

@@ -12,6 +12,8 @@ import json.ObjetoJson;
 
 /**
  * Funciones pequeñas que usan varios servicios.
+ * Todos los métodos son "static": se usan directamente, por ejemplo
+ * Herramientas.fechaActual(), sin crear un objeto.
  */
 public class Herramientas {
 
@@ -53,9 +55,11 @@ public class Herramientas {
      */
     public static <T> ListaEnlazada<T> invertir(ListaEnlazada<T> lista) {
         Pila<T> pila = new Pila<>();
+        // 1. recorremos la lista de principio a fin y apilamos cada elemento
         for (Nodo<T> n = lista.getCabeza(); n != null; n = n.getSiguiente()) {
             pila.apilar(n.getDato());
         }
+        // al desapilar sale primero el último que entró, así la lista queda al revés
         ListaEnlazada<T> resultado = new ListaEnlazada<>();
         while (!pila.estaVacia()) {
             resultado.agregar(pila.desapilar());
@@ -63,16 +67,19 @@ public class Herramientas {
         return resultado;
     }
 
-    /* ---------- Respuestas que se le envían al navegador ---------- */
+    /* ---------- Respuestas que se le envían al navegador (siempre llevan "ok": true o false) ---------- */
 
+    /** Respuesta correcta: { "ok": true, clave: valor }. */
     public static ObjetoJson exito(String clave, Object valor) {
         return new ObjetoJson().poner("ok", true).poner(clave, valor);
     }
 
+    /** Respuesta con un error general: { "ok": false, "error": mensaje }. */
     public static ObjetoJson fallo(String mensaje) {
         return new ObjetoJson().poner("ok", false).poner("error", mensaje);
     }
 
+    /** Respuesta con errores por campo: { "ok": false, "errors": { campo: mensaje } }. */
     public static ObjetoJson conErrores(ObjetoJson errores) {
         return new ObjetoJson().poner("ok", false).poner("errors", errores);
     }
