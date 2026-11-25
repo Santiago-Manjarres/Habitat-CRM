@@ -3,12 +3,16 @@ package servidor;
 import com.sun.net.httpserver.HttpServer;
 import datos.EstructuraDeDatos;
 import java.io.IOException;
+import java.awt.Desktop;
+import java.net.BindException;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
  * Punto de entrada: enciende el servidor web en http://localhost:8080
+ * (si ese puerto está ocupado, prueba el 8081, el 8082... hasta encontrar uno libre).
  * Usa el servidor HTTP que ya trae Java, así que no necesita librerías.
  */
 public class Principal {
@@ -21,7 +25,15 @@ public class Principal {
         EstructuraDeDatos estructura = new EstructuraDeDatos(carpeta.resolve("data"));
 
         // 3. Se crea el servidor y se dice quién atiende cada dirección
-        HttpServer servidor = HttpServer.create(new InetSocketAddress(8080), 0);
+        int puerto = 8080;
+        HttpServer servidor = null;
+        while (servidor == null) {
+            try {
+                servidor = HttpServer.create(new InetSocketAddress(puerto), 0);
+            } catch (BindException ocupado) {
+                puerto++;                                          // ese puerto está ocupado: probamos el siguiente
+            }
+        }
         Rutas rutas = new Rutas(estructura);
         String[] paginasDelCrm = {"/entrar", "/salir", "/resumen", "/propiedades", "/clientes"};
         for (String pagina : paginasDelCrm) {
@@ -30,6 +42,19 @@ public class Principal {
         servidor.createContext("/", new Archivos(carpeta));       // lo demás: página de inicio, CSS, imágenes
         servidor.start();
 
-        System.out.println("Habitat CRM está funcionando en http://localhost:8080");
+        String direccion = "http://localhost:" + puerto;
+        System.out.println("Habitat CRM está funcionando en " + direccion);
+        abrirNavegador(direccion);
+    }
+
+    /** Abre la página en el navegador (si el sistema no lo permite, solo se queda el mensaje de arriba). */
+    private static void abrirNavegador(String direccion) {
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(URI.create(direccion));
+            }
+        } catch (Exception e) {
+            // no pasa nada: el usuario puede abrir la dirección a mano
+        }
     }
 }
